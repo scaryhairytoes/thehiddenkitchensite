@@ -97,7 +97,11 @@ export function EdgeNav() {
   }, [])
 
   const go = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    if (id === 'top') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } else {
+      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 
   return (
