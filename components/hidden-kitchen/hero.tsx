@@ -1,28 +1,23 @@
 'use client'
 
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+
 import { Phone, MapPin } from 'lucide-react'
 import { useBusinessStatus } from './live-status'
 
 export function Hero() {
-  const ref = useRef<HTMLElement>(null)
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['start start', 'end start'],
-  })
+  const { scrollY } = useScroll()
 
-  const titleScale = useTransform(scrollYProgress, [0, 1], [1, 0.86])
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0])
-  const bottomOpacity = useTransform(scrollYProgress, [0, 0.35], [1, 0])
-  const bottomY = useTransform(scrollYProgress, [0, 0.4], [0, 30])
+  const titleScale = useTransform(scrollY, [0, 400], [1, 0.86])
+  const titleOpacity = useTransform(scrollY, [0, 300], [1, 0])
+  const bottomOpacity = useTransform(scrollY, [0, 20], [1, 0])
+  const bottomY = useTransform(scrollY, [0, 100], [0, -100])
 
   const status = useBusinessStatus()
 
   return (
     <section
       id="top"
-      ref={ref}
       className="sticky top-0 z-0 flex h-[100dvh] min-h-[540px] w-full items-center justify-center overflow-hidden bg-black"
     >
       {/* Ambient gold glow */}
