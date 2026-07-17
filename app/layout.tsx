@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`dark ${manrope.variable}`} suppressHydrationWarning>
-      <body className="bg-background font-sans antialiased" suppressHydrationWarning>
+      <body className="bg-background font-sans antialiased overflow-x-hidden" suppressHydrationWarning>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

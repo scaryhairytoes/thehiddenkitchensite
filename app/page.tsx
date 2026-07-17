@@ -9,7 +9,7 @@ import { GrainOverlay } from '@/components/hidden-kitchen/grain-overlay'
 
 export default function Page() {
   return (
-    <main className="relative bg-black text-foreground" suppressHydrationWarning>
+    <main className="relative bg-black text-foreground overflow-x-hidden" suppressHydrationWarning>
       <Preloader />
       <GrainOverlay />
       <EdgeNav />
