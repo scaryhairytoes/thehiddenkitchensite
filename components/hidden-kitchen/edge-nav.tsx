@@ -59,7 +59,7 @@ export function EdgeNav() {
         startTop: isMobile ? vh50 - 47 : vh50 - 80,
         endTop: isMobile ? 32 : 40,
         startSize: isMobile ? 120 : 220,
-        endSize: isMobile ? 36 : 48
+        endSize: isMobile ? 44 : 56
       })
     }
     updateDimensions()
@@ -278,9 +278,9 @@ export function EdgeNav() {
         aria-label="The Hidden Kitchen Symbol — back to top"
       >
         <img
-          src="/logo.svg"
+          src="/logo_only.svg"
           alt="The Hidden Kitchen Symbol"
-          className="w-full h-full object-contain transition-transform duration-300 hover:scale-105"
+          className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
         />
       </motion.button>
     </>

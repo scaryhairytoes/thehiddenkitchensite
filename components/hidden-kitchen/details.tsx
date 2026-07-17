@@ -67,7 +67,7 @@ export function Details() {
               <iframe
                 title="The Hidden Kitchen Location Map"
                 src="https://maps.google.com/maps?q=131%20S%20Division%20St,%20Carterville,%20IL%2062918&amp;t=&amp;z=15&amp;ie=UTF8&amp;iwloc=&amp;output=embed"
-                className="h-full w-full border-0 grayscale contrast-125 opacity-75 transition-all duration-500 group-hover:grayscale-0 group-hover:opacity-100"
+                className="h-full w-full border-0 transition-all duration-500"
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

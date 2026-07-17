@@ -28,8 +28,8 @@ export function Preloader() {
       {!done && (
         <motion.div
           key="preloader"
-          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden"
-          style={{ backgroundColor: '#d6af00' }}
+          suppressHydrationWarning
+          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-gold"
           exit={{ y: '-100%' }}
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
         >
