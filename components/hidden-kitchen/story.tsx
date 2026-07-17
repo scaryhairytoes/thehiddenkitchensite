@@ -15,7 +15,7 @@ export function Story() {
   return (
     <section
       id="story"
-      className="sticky top-0 z-10 min-h-screen w-full overflow-hidden bg-black pt-32 pb-24 md:pt-[22vh] lg:pt-[25vh]"
+      className="sticky top-0 z-10 min-h-screen w-full overflow-hidden bg-black pt-24 pb-20 md:pt-[15vh] lg:pt-[18vh]"
     >
       {/* ambient warmth */}
       <div

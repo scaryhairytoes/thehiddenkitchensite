@@ -24,7 +24,7 @@ export function Details() {
   return (
     <section
       id="visit"
-      className="relative z-40 min-h-screen w-full overflow-hidden bg-black py-24 md:py-32"
+      className="relative z-40 min-h-screen w-full overflow-hidden bg-black pt-24 pb-16 md:pt-[15vh] lg:pt-[18vh]"
     >
       <div
         aria-hidden

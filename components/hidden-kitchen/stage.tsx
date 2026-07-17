@@ -19,7 +19,7 @@ export function Stage() {
     <section
       id="stage"
       ref={ref}
-      className="relative z-30 min-h-screen w-full overflow-hidden bg-black pt-32 pb-24 md:pt-[22vh] lg:pt-[25vh]"
+      className="relative z-30 min-h-screen w-full overflow-hidden bg-black pt-24 pb-20 md:pt-[15vh] lg:pt-[18vh]"
     >
       {/* atmosphere background image */}
       <motion.div style={{ y: imgY, scale: imgScale }} className="absolute inset-0">

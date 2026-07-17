@@ -160,7 +160,7 @@ export function Menu() {
     <>
       <section
         id="menu"
-        className="relative z-20 flex min-h-[90vh] flex-col items-center justify-start bg-obsidian pt-32 pb-24 px-6 md:px-12 md:pt-[22vh] lg:pt-[25vh] overflow-hidden border-t border-gold/10"
+        className="relative z-20 flex min-h-[90vh] flex-col items-center justify-start bg-obsidian pt-24 pb-20 px-6 md:px-12 md:pt-[15vh] lg:pt-[18vh] overflow-hidden border-t border-gold/10"
       >
         {/* Ambient radial glow background */}
         <div
