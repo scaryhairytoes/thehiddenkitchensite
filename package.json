@@ -9,14 +9,12 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@base-ui/react": "^1.5.0",
     "@payloadcms/db-sqlite": "^3.86.0",
     "@payloadcms/email-nodemailer": "^3.86.0",
     "@payloadcms/next": "^3.86.0",
     "@payloadcms/richtext-lexical": "^3.86.0",
     "@types/nodemailer": "^8.0.1",
     "@vercel/analytics": "1.6.1",
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.42.2",
     "graphql": "^17.0.2",
