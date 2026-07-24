@@ -2,132 +2,122 @@
 
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { getNextShow, type NextShow } from './lineup'
+import { getNextShow, useLineupData, formatFacebookUrl, type NextShow } from './lineup'
+import { ExternalLink } from 'lucide-react'
 
 function pad(n: number) {
   return String(Math.max(0, Math.floor(n))).padStart(2, '0')
 }
 
+function formatShowTimeRange(startHour?: number, durationHours = 3) {
+  if (startHour === undefined || startHour === null) return '7:00 PM – 10:00 PM'
+  const endHour = (startHour + durationHours) % 24
+
+  const formatH = (h: number) => {
+    const h12 = h % 12 === 0 ? 12 : h % 12
+    const ampm = h >= 12 ? 'PM' : 'AM'
+    return `${h12}:00 ${ampm}`
+  }
+
+  return `${formatH(startHour)} – ${formatH(endHour)}`
+}
+
 export function TonightOnStage() {
+  const lineupData = useLineupData()
   const [next, setNext] = useState<NextShow | null>(null)
   const [remaining, setRemaining] = useState(0)
 
   useEffect(() => {
     const tick = () => {
       const now = new Date()
-      const ns = getNextShow(now)
+      const ns = getNextShow(now, lineupData)
       setNext(ns)
       setRemaining(ns.target.getTime() - now.getTime())
     }
     tick()
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
-  }, [])
+  }, [lineupData])
 
-  // Avoid hydration mismatch — render fallback until client clock is ready
   if (!next) {
-    return <div className="min-h-[80px]" aria-hidden />
+    return <div className="h-10 w-full animate-pulse" aria-hidden />
   }
 
   const actName = next.show.act.trim()
   const isTBA = actName === 'TBA' || actName === 'To Be Announced' || actName === ''
 
-  // If schedule is TBA, hide specific day and countdown timer!
-  if (isTBA) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="mt-6 border-t border-gold/15 pt-6"
-      >
-        <div className="flex items-center gap-2.5">
-          <span className="relative flex h-2 w-2" aria-hidden>
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-gold/70" />
-          </span>
-          <span className="text-[11px] font-bold uppercase tracking-[0.35em] text-gold">
-            Live Music · Schedule TBA
-          </span>
-        </div>
-
-        <p className="mt-2 text-2xl font-black uppercase tracking-tight text-foreground md:text-3xl">
-          Lineup Announcement Soon
-        </p>
-        <p className="mt-1 text-sm text-muted-foreground">
-          We&apos;re finalizing our weekly show dates. Check back soon for confirmed artists!
-        </p>
-      </motion.div>
-    )
-  }
-
-  // Otherwise (when an actual artist is scheduled), show day and live countdown timer!
   const totalSeconds = remaining / 1000
-  const days = totalSeconds / 86400
-  const hours = (totalSeconds % 86400) / 3600
-  const minutes = (totalSeconds % 3600) / 60
-  const seconds = totalSeconds % 60
+  const days = Math.floor(totalSeconds / 86400)
+  const hours = Math.floor((totalSeconds % 86400) / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+  const seconds = Math.floor(totalSeconds % 60)
 
-  const label = next.isLive
-    ? 'On stage now'
+  const countdownStr = days > 0
+    ? `${pad(days)}d ${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`
+    : `${pad(hours)}h ${pad(minutes)}m ${pad(seconds)}s`
+
+  const statusLabel = next.isLive
+    ? 'ON STAGE NOW'
     : next.isTonight
-      ? 'Tonight on stage'
-      : `Next up · ${next.show.day}`
+      ? 'TONIGHT ON STAGE'
+      : `UP NEXT · ${next.show.day}`
+
+  const timeRangeStr = formatShowTimeRange(next.show.hour, 3)
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 16 }}
+      initial={{ opacity: 0, y: 6 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      className="mt-6 border-t border-gold/15 pt-6"
+      className="w-full flex flex-col gap-1 text-xs sm:text-sm py-0.5 select-none"
     >
-      <div className="mb-3 flex items-center gap-2.5">
-        <span className="relative flex h-2 w-2" aria-hidden>
-          <span
-            className={
-              next.isLive
-                ? 'absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75'
-                : 'hidden'
-            }
-          />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-gold" />
-        </span>
-        <span className="text-[11px] font-bold uppercase tracking-[0.35em] text-gold">
-          {label}
+      {/* LINE 1: Status indicator + Full Performer Name (Full Width) */}
+      <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full overflow-hidden">
+        <div className="flex items-center gap-1.5 shrink-0 font-sans font-bold text-[10px] sm:text-xs uppercase tracking-[0.18em]">
+          <span className="relative flex h-2 w-2 shrink-0">
+            <span className={next.isLive ? 'absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75' : 'hidden'} />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-gold" />
+          </span>
+          <span className="font-bold text-gold shrink-0">{statusLabel}</span>
+        </div>
+
+        <span className="text-gold/40 shrink-0">·</span>
+
+        {/* Performer / Event Name - Full line headroom */}
+        <span className="font-bold uppercase tracking-tight text-white hover:text-gold transition-colors text-xs sm:text-sm md:text-base leading-tight truncate">
+          {actName}
         </span>
       </div>
 
-      <p className="text-2xl font-black uppercase tracking-tight text-foreground md:text-3xl">
-        {next.show.act}
-      </p>
-      <p className="mt-1 text-sm text-muted-foreground">{next.show.genre}</p>
+      {/* LINE 2: Date & Time range + Countdown ("Takes stage in ...") + RSVP Button */}
+      <div className="flex items-center justify-between gap-2.5 w-full border-t border-white/10 pt-1">
+        <div className="flex flex-wrap items-center gap-2 font-sans text-[10px] sm:text-xs text-white/90 min-w-0">
+          {/* Date and Time Range */}
+          <span className="font-bold text-white uppercase tracking-wider shrink-0">
+            {next.show.day} · {timeRangeStr}
+          </span>
 
-      {next.isLive ? (
-        <p className="mt-4 text-sm font-semibold uppercase tracking-[0.2em] text-gold/80">
-          The room is loud — come in.
-        </p>
-      ) : (
-        <div className="mt-4 flex items-end gap-3 font-mono tabular-nums">
-          {days >= 1 && <TimeUnit value={pad(days)} unit="days" />}
-          <TimeUnit value={pad(hours)} unit="hrs" />
-          <TimeUnit value={pad(minutes)} unit="min" />
-          <TimeUnit value={pad(seconds)} unit="sec" />
+          {!next.isLive && !isTBA && (
+            <>
+              <span className="text-gold/40 shrink-0">·</span>
+              <span className="uppercase tracking-wider text-[9px] sm:text-[10px] text-white/70 shrink-0 font-medium">Takes stage in</span>
+              <span className="font-bold text-gold tracking-wider text-xs shrink-0">{countdownStr}</span>
+            </>
+          )}
         </div>
-      )}
-    </motion.div>
-  )
-}
 
-function TimeUnit({ value, unit }: { value: string; unit: string }) {
-  return (
-    <div className="flex flex-col items-center">
-      <span className="text-2xl font-black leading-none text-foreground md:text-3xl">
-        {value}
-      </span>
-      <span className="mt-1 text-[9px] font-semibold uppercase tracking-[0.25em] text-muted-foreground">
-        {unit}
-      </span>
-    </div>
+        {next.show.facebookUrl && (
+          <a
+            href={formatFacebookUrl(next.show.facebookUrl)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 font-sans text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gold hover:bg-gold hover:text-black transition-all duration-200 border border-gold/40 bg-gold/10 px-2.5 py-0.5 rounded shrink-0"
+          >
+            <span>RSVP</span>
+            <ExternalLink className="h-2.5 w-2.5" />
+          </a>
+        )}
+      </div>
+    </motion.div>
   )
 }

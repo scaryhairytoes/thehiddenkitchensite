@@ -1,210 +1,170 @@
 'use client'
 
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { Menu as MenuIcon, X, Phone, MapPin } from 'lucide-react'
-import { useBusinessStatus } from './live-status'
 
 const SECTIONS = [
   { id: 'story', label: 'The Story' },
-  { id: 'menu', label: 'The Menu' },
+  { id: 'menu',  label: 'The Menu'  },
   { id: 'stage', label: 'The Stage' },
   { id: 'visit', label: 'The Details' },
 ]
 
-function NavStatus() {
-  const status = useBusinessStatus()
-  if (!status) return null
-  return (
-    <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em]">
-      <span className="relative flex h-[6px] w-[6px] shrink-0">
-        {status.isOpen && (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-        )}
-        <span
-          className={`relative inline-flex h-[6px] w-[6px] rounded-full ${
-            status.isOpen ? 'bg-emerald-500' : 'bg-amber-500'
-          }`}
-        />
-      </span>
-      <span className="font-bold text-foreground/80">
-        {status.isOpen ? 'Open' : 'Closed'}
-      </span>
-    </div>
-  )
-}
-
 export function EdgeNav() {
   const [active, setActive] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
-
-  const [dimensions, setDimensions] = useState({
-    startTop: 0,
-    endTop: 40,
-    startSize: 220,
-    endSize: 48
-  })
-
-  const dimensionsRef = useRef(dimensions)
+  const [logoSize, setLogoSize] = useState({ top: 40, size: 56 })
 
   useEffect(() => {
-    dimensionsRef.current = dimensions
-  }, [dimensions])
-
-  useEffect(() => {
-    const updateDimensions = () => {
+    const update = () => {
       const isMobile = window.innerWidth < 768
-      const vh50 = window.innerHeight / 2
-      setDimensions({
-        startTop: isMobile ? vh50 - 47 : vh50 - 80,
-        endTop: isMobile ? 32 : 40,
-        startSize: isMobile ? 120 : 220,
-        endSize: isMobile ? 44 : 56
-      })
+      setLogoSize({ top: isMobile ? 32 : 40, size: isMobile ? 44 : 56 })
     }
-    updateDimensions()
-    window.addEventListener('resize', updateDimensions)
-    return () => window.removeEventListener('resize', updateDimensions)
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
   }, [])
 
   const { scrollY } = useScroll()
   const logoOpacity = useTransform(scrollY, [100, 300], [0, 1])
-  const statusOpacity = useTransform(scrollY, [150, 320], [0, 1])
 
+  // Scroll-spy: highlight nav link matching the section in view (cleared in hero section)
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (entry.target.id === 'top') {
-              setActive(null)
-            } else {
-              setActive(entry.target.id)
-            }
+    const handleScroll = () => {
+      // Hero section check: if in top half of screen before story, clear highlight
+      const storyEl = document.getElementById('story')
+      const heroThreshold = storyEl ? storyEl.offsetTop - 120 : window.innerHeight * 0.6
+
+      if (window.scrollY < heroThreshold) {
+        setActive(null)
+        return
+      }
+
+      const ids = ['story', 'menu', 'stage', 'visit']
+      const viewportCenter = window.innerHeight * 0.4
+
+      let currentActive: string | null = null
+      let minDistance = Infinity
+
+      for (const id of ids) {
+        const el = document.getElementById(id)
+        if (el) {
+          const rect = el.getBoundingClientRect()
+          if (rect.top <= viewportCenter && rect.bottom >= viewportCenter) {
+            currentActive = id
+            break
           }
-        })
-      },
-      { rootMargin: '-40% 0px -40% 0px', threshold: 0 }
-    )
+          const dist = Math.abs(rect.top - viewportCenter)
+          if (dist < minDistance) {
+            minDistance = dist
+            currentActive = id
+          }
+        }
+      }
 
-    const ids = ['top', 'story', 'menu', 'stage', 'visit']
-    ids.forEach((id) => {
-      const el = document.getElementById(id)
-      if (el) observer.observe(el)
-    })
+      setActive(currentActive)
+    }
 
-    return () => observer.disconnect()
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    window.addEventListener('resize', handleScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleScroll)
+    }
   }, [])
 
   const go = (id: string) => {
     if (id === 'top') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     } else {
-      document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+      const el = document.getElementById(id)
+      if (el) {
+        const headerOffset = window.innerWidth < 768 ? 64 : 80
+        const elementPosition = el.getBoundingClientRect().top
+        const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth',
+        })
+      }
     }
   }
 
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-[80] w-full h-16 md:h-20 bg-black transition-all duration-300">
-        <div className="relative mx-auto max-w-[1500px] h-full flex items-center justify-between">
-          
-          {/* Desktop Left Half (Story, Menu) */}
-          <div className="hidden md:flex w-1/2 h-full justify-evenly items-center pr-8">
-            <button
-              onClick={() => go('story')}
-              className={`relative py-2 text-xs font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
-                active === 'story' ? 'text-gold' : 'text-foreground/50 hover:text-gold'
-              }`}
-            >
-              The Story
-              {active === 'story' && (
-                <motion.span
-                  layoutId="activeIndicator"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
 
-            <button
-              onClick={() => go('menu')}
-              className={`relative py-2 text-xs font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
-                active === 'menu' ? 'text-gold' : 'text-foreground/50 hover:text-gold'
-              }`}
-            >
-              The Menu
-              {active === 'menu' && (
-                <motion.span
-                  layoutId="activeIndicator"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
-          </div>
+        {/* Desktop nav — 5-column grid: [Story] [Menu] [center-spacer] [Stage] [Details] */}
+        {/* The center spacer reserves the logo footprint and pushes inner links apart */}
+        <div
+          className="hidden md:grid w-full h-full items-center px-6 lg:px-10 xl:px-16"
+          style={{ gridTemplateColumns: '1fr 1fr clamp(240px, 25vw, 360px) 1fr 1fr' }}
+        >
+          {/* THE STORY — outer left */}
+          <button
+            onClick={() => go('story')}
+            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
+              active === 'story' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+            }`}
+          >
+            The Story
+          </button>
 
-          {/* Desktop Right Half (Stage, Details) */}
-          <div className="hidden md:flex w-1/2 h-full justify-evenly items-center pl-8">
-            <button
-              onClick={() => go('stage')}
-              className={`relative py-2 text-xs font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
-                active === 'stage' ? 'text-gold' : 'text-foreground/50 hover:text-gold'
-              }`}
-            >
-              The Stage
-              {active === 'stage' && (
-                <motion.span
-                  layoutId="activeIndicator"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
+          {/* THE MENU — inner left, pushed left by center spacer */}
+          <button
+            onClick={() => go('menu')}
+            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
+              active === 'menu' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+            }`}
+          >
+            The Menu
+          </button>
 
-            <button
-              onClick={() => go('visit')}
-              className={`relative py-2 text-xs font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
-                active === 'visit' ? 'text-gold' : 'text-foreground/50 hover:text-gold'
-              }`}
-            >
-              The Details
-              {active === 'visit' && (
-                <motion.span
-                  layoutId="activeIndicator"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-gold"
-                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                />
-              )}
-            </button>
-          </div>
+          {/* Center spacer — logo floats here via absolute positioning */}
+          <div aria-hidden />
 
-          {/* Mobile Navbar */}
-          <div className="flex md:hidden mx-auto h-full items-center justify-between px-6 w-full">
-            <div className="w-10" />
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="text-gold/80 hover:text-gold p-2 transition-colors focus:outline-none w-10 flex justify-end"
-              aria-label={menuOpen ? 'Close Menu' : 'Open Menu'}
-            >
-              {menuOpen ? (
-                <X className="h-6 w-6" suppressHydrationWarning />
-              ) : (
-                <MenuIcon className="h-6 w-6" suppressHydrationWarning />
-              )}
-            </button>
-          </div>
+          {/* THE STAGE — inner right, pushed right by center spacer */}
+          <button
+            onClick={() => go('stage')}
+            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
+              active === 'stage' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+            }`}
+          >
+            The Stage
+          </button>
 
+          {/* THE DETAILS — outer right */}
+          <button
+            onClick={() => go('visit')}
+            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
+              active === 'visit' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+            }`}
+          >
+            The Details
+          </button>
         </div>
-      </header>
 
-      {/* Floating inline status on scroll */}
-      <motion.div
-        style={{ opacity: menuOpen ? 0 : statusOpacity }}
-        className="fixed top-4 left-4 md:top-6 md:left-8 z-[95] pointer-events-auto"
-      >
-        <NavStatus />
-      </motion.div>
+        {/* Mobile Navbar */}
+        <div className="flex md:hidden w-full h-full items-center justify-between px-6">
+          <div className="w-10" />
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="text-gold/80 hover:text-gold p-2 transition-colors focus:outline-none w-10 flex justify-end"
+            aria-label={menuOpen ? 'Close Menu' : 'Open Menu'}
+          >
+            {menuOpen ? (
+              <X className="h-6 w-6" suppressHydrationWarning />
+            ) : (
+              <MenuIcon className="h-6 w-6" suppressHydrationWarning />
+            )}
+          </button>
+        </div>
+
+      </header>
 
       {/* Mobile Navigation Menu */}
       <AnimatePresence>
@@ -225,7 +185,7 @@ export function EdgeNav() {
                     setMenuOpen(false)
                   }}
                   className={`text-xl font-bold uppercase tracking-[0.35em] transition-colors duration-300 ${
-                    active === s.id ? 'text-gold' : 'text-foreground/60'
+                    active === s.id ? 'text-gold' : 'text-foreground/60 hover:text-gold'
                   }`}
                 >
                   {s.label}
@@ -233,7 +193,7 @@ export function EdgeNav() {
               ))}
             </div>
 
-            {/* Mobile CTAs — minimal text links */}
+            {/* Mobile CTAs */}
             <div className="mt-2 flex items-center gap-5 text-[11px] font-semibold uppercase tracking-[0.25em]">
               <a
                 href="tel:+16186814208"
@@ -255,7 +215,7 @@ export function EdgeNav() {
         )}
       </AnimatePresence>
 
-      {/* Bottom-left: vertical scroll hint */}
+      {/* Bottom-left scroll hint */}
       <div className="pointer-events-none fixed bottom-4 left-4 z-[70] hidden items-center gap-2 md:flex md:left-6 md:bottom-6">
         <motion.span
           animate={{ opacity: [0.3, 1, 0.3] }}
@@ -266,13 +226,13 @@ export function EdgeNav() {
         </motion.span>
       </div>
 
-      {/* Floating Snapping Logo Symbol */}
+      {/* Floating logo symbol — fades in on scroll, click returns to top */}
       <motion.button
         onClick={() => go('top')}
         style={{
-          top: dimensions.endTop,
-          width: dimensions.endSize,
-          height: dimensions.endSize,
+          top: logoSize.top,
+          width: logoSize.size,
+          height: logoSize.size,
           opacity: menuOpen ? 0 : logoOpacity,
         }}
         suppressHydrationWarning

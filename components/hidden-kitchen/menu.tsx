@@ -160,62 +160,74 @@ export function Menu() {
     <>
       <section
         id="menu"
-        className="relative z-20 flex flex-col items-center justify-start bg-obsidian pt-24 pb-32 px-6 md:px-12 md:pt-[15vh] lg:pt-[18vh] md:pb-32 overflow-hidden border-t border-gold/10"
+        className="relative z-20 w-full min-h-[55vh] md:min-h-[65vh] py-14 md:py-20 flex flex-col items-center justify-center bg-black overflow-hidden px-6 md:px-12"
       >
-        {/* Ambient radial glow background */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-[75vh] w-[75vh] rounded-full bg-[radial-gradient(circle,rgba(214,175,0,0.14),transparent_65%)] blur-3xl"
+      {/* ── Background Video System (Ultra-Smooth Dark Blended) ───── */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10 bg-black">
+        {/* Single Full-Viewport Atmospheric Background Video */}
+        <video
+          src="/videos/the_menu.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 h-full w-full object-cover opacity-45 contrast-105 saturate-95 pointer-events-none select-none"
         />
 
-        <div className="relative z-10 mx-auto max-w-4xl text-center flex flex-col items-center">
-          {/* Big Headline */}
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="text-balance text-[14vw] font-black uppercase leading-[0.85] tracking-tighter text-foreground sm:text-[11vw] md:text-[8vw]"
-          >
+        {/* Global Dark Tint Overlay Layer */}
+        <div className="absolute inset-0 bg-black/55 pointer-events-none" />
+
+        {/* Continuous Full-Width Horizontal Fade */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent pointer-events-none" />
+
+        {/* Ultra-Smooth Top & Bottom Vignettes — seamless natural flow into surrounding sections */}
+        <div className="absolute inset-x-0 top-0 h-20 md:h-28 bg-gradient-to-b from-black via-black/60 to-transparent pointer-events-none" />
+        <div className="absolute inset-x-0 bottom-0 h-20 md:h-28 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
+      </div>
+      {/* ── End Background Video System ──────────────────────────────────── */}
+
+        <div className="relative z-10 flex flex-col items-center mx-auto w-full max-w-[100vw]">
+          {/* Main Headline Line 1 */}
+          <h2 className="text-center text-[24vw] sm:text-[22vw] md:text-[20vw] lg:text-[18vw] xl:text-[17vw] 2xl:text-[250px] font-black uppercase leading-[0.8] tracking-tighter text-foreground whitespace-nowrap">
             Eat like
-            <br />
-            <span className="gold-shimmer">family.</span>
-          </motion.h2>
+          </h2>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-            className="mt-8 max-w-xl text-balance text-lg md:text-xl leading-relaxed text-muted-foreground/90 font-light"
-          >
-            Handcrafted starters, 16" thin crust pizzas, savory pastas, signature entrees & craft cocktails made with love.
-          </motion.p>
+          {/* Line 2 & Links Wrapper */}
+          <div className="flex flex-col items-stretch w-max max-w-full">
+            <h2 className="text-center text-[24vw] sm:text-[22vw] md:text-[20vw] lg:text-[18vw] xl:text-[17vw] 2xl:text-[250px] font-black uppercase leading-[0.8] tracking-tighter text-foreground whitespace-nowrap">
+              <span className="gold-shimmer">family.</span>
+            </h2>
 
-          {/* Main Clickable Trigger Button */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            whileInView={{ opacity: 1, scale: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, delay: 0.3 }}
-            className="mt-10"
-          >
-            <button
-              onClick={() => openWithCategory('all')}
-              className="group relative inline-flex items-center gap-4 overflow-hidden rounded-full bg-gradient-to-r from-gold via-amber-400 to-yellow-500 p-[1px] shadow-[0_0_35px_rgba(214,175,0,0.25)] transition-all duration-300 hover:shadow-[0_0_50px_rgba(214,175,0,0.5)] hover:scale-105"
-            >
-              <span className="flex items-center gap-3.5 rounded-full bg-black/90 px-8 py-4 text-sm md:text-base font-bold uppercase tracking-[0.2em] text-foreground transition-all duration-300 group-hover:bg-black/70 group-hover:text-gold">
-                <img
-                  src="/logo_only.svg"
-                  alt=""
-                  className="h-6 w-6 object-contain transition-transform duration-300 group-hover:scale-110"
-                />
-                <span>View Full Menu</span>
-                <ArrowRight className="h-5 w-5 text-gold transition-transform duration-300 group-hover:translate-x-1" />
+            {/* Text action links with vertical bar separator */}
+            <div className="mt-8 md:mt-12 flex items-center justify-center w-full gap-3 sm:gap-6 md:gap-8 px-4">
+              <button
+                onClick={() => openWithCategory('all')}
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black uppercase tracking-widest text-neutral-300 transition-colors duration-300 hover:text-gold whitespace-nowrap"
+              >
+                View Menu
+              </button>
+
+              <span className="text-gold/50 font-light select-none text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl" aria-hidden>
+                |
               </span>
-            </button>
-          </motion.div>
+
+              <a
+                href="tel:+16186814208"
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black uppercase tracking-widest text-neutral-300 transition-colors duration-300 hover:text-gold whitespace-nowrap"
+              >
+                Order Delivery
+              </a>
+            </div>
+          </div>
         </div>
+
+        {/* ── BOTTOM SEAM SEAL ───────────────────────────────────────────
+            z-[5]: sits ABOVE all bg layers, guarantees smooth blend into Stage
+        ──────────────────────────────────────────────────────────────── */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-x-0 bottom-0 h-20 pointer-events-none z-[5] bg-gradient-to-t from-black via-black/80 to-transparent"
+        />
       </section>
 
       {/* Full Screen Menu Modal Overlay */}
@@ -282,7 +294,7 @@ export function Menu() {
                     onClick={() => setActiveCategory('all')}
                     className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
                       activeCategory === 'all'
-                        ? 'bg-gold text-black shadow-[0_0_15px_rgba(214,175,0,0.4)]'
+                        ? 'bg-gold text-black shadow-[0_0_15px_rgba(197,163,104,0.4)]'
                         : 'border border-gold/20 bg-black/40 text-foreground/70 hover:border-gold/50 hover:text-foreground'
                     }`}
                   >
@@ -295,7 +307,7 @@ export function Menu() {
                       onClick={() => setActiveCategory(panel.key)}
                       className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
                         activeCategory === panel.key
-                          ? 'bg-gold text-black shadow-[0_0_15px_rgba(214,175,0,0.4)]'
+                          ? 'bg-gold text-black shadow-[0_0_15px_rgba(197,163,104,0.4)]'
                           : 'border border-gold/20 bg-black/40 text-foreground/70 hover:border-gold/50 hover:text-foreground'
                       }`}
                     >
@@ -309,9 +321,9 @@ export function Menu() {
             {/* Modal Body: Scrollable Menu Grid */}
             <div
               ref={modalContentRef}
-              className="flex-1 overflow-y-auto px-6 py-8 md:px-16 lg:px-24 scroll-smooth"
+              className="flex-1 overflow-y-auto px-6 py-8 md:px-16 lg:px-24 xl:px-32 scroll-smooth"
             >
-              <div className="mx-auto max-w-6xl space-y-14 pb-16">
+              <div className="mx-auto max-w-6xl xl:max-w-7xl space-y-14 pb-16">
                 {filteredPanels.length === 0 ? (
                   <div className="py-24 text-center">
                     <p className="text-xl text-muted-foreground">No menu items found matching "{searchQuery}"</p>
@@ -357,11 +369,11 @@ export function Menu() {
                             className="group flex flex-col gap-1.5 rounded-xl border border-white/5 bg-white/[0.02] p-4 transition-all duration-300 hover:border-gold/30 hover:bg-gold/[0.03]"
                           >
                             <div className="flex items-baseline justify-between gap-2">
-                              <h5 className="font-bold tracking-tight text-foreground text-lg md:text-xl transition-colors group-hover:text-gold">
+                              <h5 className="font-bold tracking-tight text-white text-lg md:text-xl transition-colors group-hover:text-gold">
                                 {item.name}
                               </h5>
                             </div>
-                            <p className="text-sm leading-relaxed text-muted-foreground/90">
+                            <p className="text-sm leading-relaxed text-white/80 font-sans">
                               {item.note}
                             </p>
                           </motion.div>
@@ -373,10 +385,10 @@ export function Menu() {
 
                 {/* Modal Footer Callout */}
                 <div className="mt-12 rounded-2xl border border-gold/20 bg-gradient-to-r from-gold/10 via-black to-gold/10 p-8 text-center flex flex-col items-center gap-4">
-                  <h5 className="text-xl font-bold uppercase tracking-wider text-foreground">
+                  <h5 className="text-xl font-bold uppercase tracking-wider text-white">
                     Ready to Enjoy?
                   </h5>
-                  <p className="text-sm text-muted-foreground max-w-md">
+                  <p className="text-sm text-white/80 font-sans max-w-md">
                     Visit us in person or call ahead for dine-in and takeout options.
                   </p>
                   <a
