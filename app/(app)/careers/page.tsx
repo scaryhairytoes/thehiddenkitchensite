@@ -16,6 +16,7 @@ import {
   FileText,
   Upload,
 } from 'lucide-react'
+import { Footer } from '@/components/hidden-kitchen/footer'
 
 // ── Position definitions ──────────────────────────────────────────────────────
 type PositionCategory = 'Front of House' | 'Back of House' | 'Any' | ''
@@ -639,6 +640,9 @@ export default function CareersPage() {
           </main>
 
         </div>
+        
+        {/* Global Footer */}
+        <Footer />
       </div>
     </div>
   )

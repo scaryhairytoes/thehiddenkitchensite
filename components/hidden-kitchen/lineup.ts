@@ -10,6 +10,21 @@ export type Show = {
   dateStr?: string // YYYY-MM-DD
   monthKey?: string // 'JUL' | 'AUG' | 'SEP' | 'OCT' | 'NOV' | 'DEC'
   facebookUrl?: string
+  socialUrl?: string
+}
+
+type CMSDoc = {
+  day?: string
+  weekday?: number
+  act?: string
+  genre?: string
+  category?: string
+  hour?: number
+  dateStr?: string
+  monthKey?: string
+  facebookUrl?: string
+  socialUrl?: string
+  actUrl?: string
 }
 
 export function formatFacebookUrl(url?: string): string {
@@ -39,57 +54,37 @@ export function useLineupData() {
     async function loadCMS() {
       try {
         const res = await fetch('/api/lineup?limit=100', { cache: 'no-store' })
-        if (res.ok) {
-          const json = await res.json()
-          if (json.docs && Array.isArray(json.docs) && json.docs.length > 0) {
-            const cmsShows: Show[] = json.docs.map((doc: any) => ({
-              day: doc.day,
-              weekday: typeof doc.weekday === 'number' ? doc.weekday : 3,
-              act: doc.act,
-              genre: doc.genre || 'Live Music',
-              category: doc.category || 'Live Music',
-              hour: typeof doc.hour === 'number' ? doc.hour : 17,
-              dateStr: doc.dateStr || undefined,
-              monthKey: doc.monthKey || getMonthKey(doc.day || ''),
-              facebookUrl: doc.facebookUrl ? formatFacebookUrl(doc.facebookUrl) : undefined,
-            }))
 
-            // Match static lineup entries to CMS shows by act name or date number
-            const merged = lineup.map((staticShow) => {
-              const cmsMatch = cmsShows.find((c) => {
-                if (!c.act) return false
-                const sameAct = c.act.toLowerCase().trim() === staticShow.act.toLowerCase().trim()
-                const staticDayNum = staticShow.day.replace(/\D/g, '')
-                const cmsDayNum = c.day.replace(/\D/g, '')
-                const sameDayNum = staticDayNum && cmsDayNum && staticDayNum === cmsDayNum
-                const sameMonth = (c.monthKey || '').toUpperCase() === (staticShow.monthKey || '').toUpperCase()
-
-                return (sameAct && (sameDayNum || sameMonth)) || (sameDayNum && sameMonth)
-              })
-
-              if (cmsMatch && cmsMatch.facebookUrl) {
-                return { ...staticShow, facebookUrl: cmsMatch.facebookUrl }
-              }
-              return staticShow
-            })
-
-            // Add any custom CMS entries not in static array
-            for (const cmsShow of cmsShows) {
-              const exists = merged.some(
-                (m) =>
-                  m.act.toLowerCase().trim() === cmsShow.act.toLowerCase().trim() &&
-                  m.day.replace(/\D/g, '') === cmsShow.day.replace(/\D/g, '')
-              )
-              if (!exists) {
-                merged.push(cmsShow)
-              }
-            }
-
-            setData(merged)
-          }
+        if (!res.ok) {
+          console.warn('[Lineup] CMS returned non-200 status:', res.status)
+          return
         }
-      } catch (e) {
-        // Silent fallback
+
+        const text = await res.text()
+        if (!text || !text.trim()) {
+          console.warn('[Lineup] Received empty body from /api/lineup')
+          return
+        }
+
+        const json = JSON.parse(text)
+        if (json.docs && Array.isArray(json.docs) && json.docs.length > 0) {
+          const cmsShows: Show[] = json.docs.map((doc: CMSDoc) => ({
+            day: doc.day || '',
+            weekday: typeof doc.weekday === 'number' ? doc.weekday : 3,
+            act: doc.act || '',
+            genre: doc.genre || 'Live Music',
+            category: doc.category || 'Live Music',
+            hour: typeof doc.hour === 'number' ? doc.hour : 17,
+            dateStr: doc.dateStr || undefined,
+            monthKey: doc.monthKey || getMonthKey(doc.day || ''),
+            facebookUrl: doc.facebookUrl ? formatFacebookUrl(doc.facebookUrl) : undefined,
+            socialUrl: doc.socialUrl || doc.actUrl ? formatFacebookUrl(doc.socialUrl || doc.actUrl) : undefined,
+          }))
+
+          setData(cmsShows)
+        }
+      } catch {
+        // Silent fallback to static lineup during dev server warmup
       }
     }
     loadCMS()
@@ -97,7 +92,6 @@ export function useLineupData() {
 
   return data
 }
-
 
 // Single source of truth for fallback schedule.
 export const lineup: Show[] = [
@@ -128,22 +122,50 @@ export type NextShow = {
 // Compute the next (or currently-live) show relative to `now`.
 export function getNextShow(now: Date, customLineup: Show[] = lineup): NextShow {
   const currentLineup = customLineup.length > 0 ? customLineup : lineup
-  for (const show of currentLineup) {
-    if (show.dateStr) {
-      const [year, month, day] = show.dateStr.split('-').map(Number)
-      const start = new Date(year, month - 1, day, show.hour, 0, 0, 0)
-      const end = new Date(start)
-      end.setHours(show.hour + 3, 0, 0, 0) // 5 PM - 8 PM (3h set)
 
-      if (now <= end) {
-        const isTonight = now.toDateString() === start.toDateString()
-        const isLive = now >= start && now <= end
-        return { show, target: start, isTonight, isLive }
+  const parsedShows = currentLineup
+    .map((show) => {
+      let start: Date | null = null
+
+      if (show.dateStr) {
+        const [year, month, day] = show.dateStr.split('-').map(Number)
+        start = new Date(year, month - 1, day, show.hour, 0, 0, 0)
+      } else {
+        // Fallback parsing for day strings like "Jul 29"
+        const currentYear = now.getFullYear()
+        const parsedMs = Date.parse(`${show.day}, ${currentYear} ${show.hour}:00:00`)
+        if (!isNaN(parsedMs)) {
+          start = new Date(parsedMs)
+        }
       }
+
+      if (!start) return null
+
+      const end = new Date(start)
+      end.setHours(start.getHours() + 3, 0, 0, 0) // 3-hour set
+
+      return { show, start, end }
+    })
+    .filter((item): item is { show: Show; start: Date; end: Date } => item !== null)
+
+  // Filter for active/upcoming shows and sort chronologically
+  const upcoming = parsedShows
+    .filter((item) => now <= item.end)
+    .sort((a, b) => a.start.getTime() - b.start.getTime())
+
+  if (upcoming.length > 0) {
+    const nextItem = upcoming[0]
+    const isTonight = now.toDateString() === nextItem.start.toDateString()
+    const isLive = now >= nextItem.start && now <= nextItem.end
+    return {
+      show: nextItem.show,
+      target: nextItem.start,
+      isTonight,
+      isLive,
     }
   }
 
-  // Fallback (if past all scheduled dates): first show
+  // Fallback if all dates are in the past: return first element in original lineup
   const show = currentLineup[0]
   const target = new Date(now)
   target.setHours(show.hour, 0, 0, 0)
@@ -165,4 +187,3 @@ export function getGoogleCalendarUrl(show: Show): string {
 
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${dates}`
 }
-

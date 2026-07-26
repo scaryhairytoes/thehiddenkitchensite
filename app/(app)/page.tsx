@@ -7,6 +7,7 @@ import { Stage } from '@/components/hidden-kitchen/stage'
 import { Details } from '@/components/hidden-kitchen/details'
 import { Preloader } from '@/components/hidden-kitchen/preloader'
 import { GrainOverlay } from '@/components/hidden-kitchen/grain-overlay'
+import { SectionDivider } from '@/components/hidden-kitchen/section-divider'
 
 export default function Page() {
   return (
@@ -14,12 +15,22 @@ export default function Page() {
       <Preloader />
       <GrainOverlay />
       <EdgeNav />
-      {/* Card-stack: each section is sticky and layers over the previous on scroll */}
+
       <Hero />
+      <SectionDivider />
+
       <UpNext />
+      <SectionDivider />
+
       <Story />
+      <SectionDivider />
+
       <Menu />
+      <SectionDivider />
+
       <Stage />
+      <SectionDivider />
+
       <Details />
     </main>
   )

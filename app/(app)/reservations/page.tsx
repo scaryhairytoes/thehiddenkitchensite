@@ -12,6 +12,7 @@ import {
   ArrowRight,
   Loader2,
 } from 'lucide-react'
+import { Footer } from '@/components/hidden-kitchen/footer'
 
 // ── Shared style tokens ───────────────────────────────────────────────────────
 const inputCls =
@@ -334,6 +335,9 @@ export default function ReservationsPage() {
           </main>
 
         </div>
+        
+        {/* Global Footer */}
+        <Footer />
       </div>
     </div>
   )

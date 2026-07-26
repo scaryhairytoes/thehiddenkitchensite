@@ -69,6 +69,9 @@
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
+  --gold: #c5a368;
+  --gold-muted: #9a7d46;
+  --obsidian: oklch(0.11 0.005 60);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -164,6 +167,7 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -174,21 +178,20 @@
   0% {
     background-position: 200% center;
   }
+
   100% {
     background-position: -200% center;
   }
 }
 
 .gold-shimmer {
-  background-image: linear-gradient(
-    110deg,
-    var(--gold-muted) 0%,
-    var(--gold) 30%,
-    oklch(0.96 0.09 95) 48%,
-    oklch(0.99 0.04 100) 52%,
-    var(--gold) 70%,
-    var(--gold-muted) 100%
-  );
+  background-image: linear-gradient(110deg,
+      var(--gold-muted) 0%,
+      var(--gold) 30%,
+      oklch(0.96 0.09 95) 48%,
+      oklch(0.99 0.04 100) 52%,
+      var(--gold) 70%,
+      var(--gold-muted) 100%);
   background-size: 200% auto;
   background-clip: text;
   -webkit-background-clip: text;
@@ -208,33 +211,43 @@
   0% {
     transform: translate(0, 0);
   }
+
   10% {
     transform: translate(-5%, -10%);
   }
+
   20% {
     transform: translate(-15%, 5%);
   }
+
   30% {
     transform: translate(7%, -25%);
   }
+
   40% {
     transform: translate(-5%, 25%);
   }
+
   50% {
     transform: translate(-15%, 10%);
   }
+
   60% {
     transform: translate(15%, 0%);
   }
+
   70% {
     transform: translate(0%, 15%);
   }
+
   80% {
     transform: translate(3%, -15%);
   }
+
   90% {
     transform: translate(-10%, 10%);
   }
+
   100% {
     transform: translate(0, 0);
   }

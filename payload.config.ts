@@ -1,22 +1,51 @@
 import { buildConfig } from 'payload'
+// Payload CMS Configuration - The Hidden Kitchen v2
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { sqliteAdapter } from '@payloadcms/db-sqlite'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { initialMenuPanels, initialLineupShows } from '@/lib/initial-cms-data'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
 // ── Category label map for email display ─────────────────────────────────────
 const CATEGORY_LABELS: Record<string, string> = {
-  'live-music':    'Live Music',
-  'comedy':        'Comedy & Stage Acts',
+  'live-music': 'Live Music',
+  'comedy': 'Comedy & Stage Acts',
   'private-event': 'Private Event / Party',
-  'community':     'Community / Public Host',
+  'community': 'Community / Public Host',
 }
 
 export default buildConfig({
+  onInit: async (payload) => {
+    try {
+      const menuCount = await payload.count({ collection: 'menu' })
+      if (menuCount.totalDocs === 0) {
+        console.log('[Payload] Auto-seeding menu details...')
+        for (const panel of initialMenuPanels) {
+          await payload.create({
+            collection: 'menu',
+            data: panel as any,
+          })
+        }
+      }
+
+      const lineupCount = await payload.count({ collection: 'lineup' })
+      if (lineupCount.totalDocs === 0) {
+        console.log('[Payload] Auto-seeding stage details...')
+        for (const show of initialLineupShows) {
+          await payload.create({
+            collection: 'lineup',
+            data: show as any,
+          })
+        }
+      }
+    } catch (err) {
+      console.error('[Payload onInit] Error auto-seeding:', err)
+    }
+  },
   admin: {
     user: 'users',
   },
@@ -42,6 +71,7 @@ export default buildConfig({
     client: {
       url: process.env.DATABASE_URI || 'file:./payload.db',
     },
+    push: false,
   }),
   collections: [
     {
@@ -99,13 +129,13 @@ export default buildConfig({
                 : ''
 
             const categoryRows = [
-              musicLink     ? row('Music Link',      `<a href="${musicLink}" style="color:#D6AF00;">${musicLink}</a>`) : '',
-              actType       ? row('Act Type',         actType)       : '',
-              mediaLink     ? row('Media Link',       `<a href="${mediaLink}" style="color:#D6AF00;">${mediaLink}</a>`) : '',
-              setLength     ? row('Set Length',       setLength)     : '',
-              guestCount    ? row('Guest Count',      guestCount)    : '',
-              cateringNeeds ? row('Catering Needs',   cateringNeeds) : '',
-              expectedDraw  ? row('Expected Draw',    expectedDraw)  : '',
+              musicLink ? row('Music Link', `<a href="${musicLink}" style="color:#D6AF00;">${musicLink}</a>`) : '',
+              actType ? row('Act Type', actType) : '',
+              mediaLink ? row('Media Link', `<a href="${mediaLink}" style="color:#D6AF00;">${mediaLink}</a>`) : '',
+              setLength ? row('Set Length', setLength) : '',
+              guestCount ? row('Guest Count', guestCount) : '',
+              cateringNeeds ? row('Catering Needs', cateringNeeds) : '',
+              expectedDraw ? row('Expected Draw', expectedDraw) : '',
             ].join('')
 
             const html = `
@@ -117,13 +147,13 @@ export default buildConfig({
                 </div>
 
                 <table style="width:100%;border-collapse:collapse;">
-                  ${row('Name',             name)}
-                  ${row('Email',            `<a href="mailto:${email}" style="color:#D6AF00;">${email}</a>`)}
+                  ${row('Name', name)}
+                  ${row('Email', `<a href="mailto:${email}" style="color:#D6AF00;">${email}</a>`)}
                   ${phone ? row('Phone', phone) : ''}
-                  ${row('Category',         categoryLabel)}
-                  ${row('Preferred Dates',  preferredDates)}
+                  ${row('Category', categoryLabel)}
+                  ${row('Preferred Dates', preferredDates)}
                   ${categoryRows}
-                  ${row('Details',          details?.replace(/\n/g, '<br/>'))}
+                  ${row('Details', details?.replace(/\n/g, '<br/>'))}
                 </table>
 
                 <p style="margin-top:36px;font-size:10px;color:rgba(214,175,0,0.45);text-align:center;letter-spacing:0.2em;text-transform:uppercase;">
@@ -134,7 +164,7 @@ export default buildConfig({
 
             try {
               await req.payload.sendEmail({
-                to:      'events@thehiddenkitchen62.com',
+                to: 'events@thehiddenkitchen62.com',
                 replyTo: email,
                 subject: `[New ${categoryLabel} Booking] ${name}`,
                 html,
@@ -151,10 +181,10 @@ export default buildConfig({
           type: 'select',
           required: true,
           options: [
-            { label: 'Live Music',              value: 'live-music'    },
-            { label: 'Comedy & Stage Acts',     value: 'comedy'        },
-            { label: 'Private Event / Party',   value: 'private-event' },
-            { label: 'Community / Public Host', value: 'community'     },
+            { label: 'Live Music', value: 'live-music' },
+            { label: 'Comedy & Stage Acts', value: 'comedy' },
+            { label: 'Private Event / Party', value: 'private-event' },
+            { label: 'Community / Public Host', value: 'community' },
           ],
         },
         {
@@ -238,7 +268,6 @@ export default buildConfig({
           async ({ doc, operation, req }) => {
             if (operation !== 'create') return
 
-
             const {
               position, name, email, phone, availability, message,
               submissionMethod, resume, job1, job2, job3, education
@@ -257,14 +286,15 @@ export default buildConfig({
               const fileUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}${resume.url}`
               experienceHtml = row('Resume', `<a href="${fileUrl}" style="color:#D6AF00;">Download / View Resume</a>`)
             } else if (submissionMethod === 'manual') {
-              const formatJob = (job: any, index: number) => {
+              type JobType = { company?: string; title?: string; dates?: string; responsibilities?: string }
+              const formatJob = (job: JobType | undefined, index: number) => {
                 if (!job || !job.company) return ''
                 return `
                   <tr>
                     <td colspan="2" style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:14px;color:#ffffff;line-height:1.5;">
                       <strong style="color:#D6AF00;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;">Job ${index}</strong><br/>
                       <strong>${job.company}</strong> — ${job.title} (${job.dates})<br/>
-                      <div style="margin-top:4px;color:rgba(255,255,255,0.7);">${job.responsibilities?.replace(/\\n/g, '<br/>') || ''}</div>
+                      <div style="margin-top:4px;color:rgba(255,255,255,0.7);">${job.responsibilities?.replace(/\n/g, '<br/>') || ''}</div>
                     </td>
                   </tr>
                 `
@@ -273,7 +303,7 @@ export default buildConfig({
                 ${formatJob(job1, 1)}
                 ${formatJob(job2, 2)}
                 ${formatJob(job3, 3)}
-                ${education ? row('Education', education.replace(/\\n/g, '<br/>')) : ''}
+                ${education ? row('Education', education.replace(/\n/g, '<br/>')) : ''}
               `
             }
 
@@ -282,17 +312,17 @@ export default buildConfig({
                 <div style="text-align:center;margin-bottom:32px;">
                   <p style="font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#D6AF00;margin:0 0 8px;">The Hidden Kitchen</p>
                   <h1 style="font-size:26px;font-weight:900;text-transform:uppercase;margin:0;color:#ffffff;letter-spacing:-0.02em;">New Career Application</h1>
-                  <p style="margin:10px 0 0;font-size:13px;color:#D6AF00;letter-spacing:0.05em;">\${position}</p>
+                  <p style="margin:10px 0 0;font-size:13px;color:#D6AF00;letter-spacing:0.05em;">${position}</p>
                 </div>
 
                 <table style="width:100%;border-collapse:collapse;">
-                  \${row('Name',             name)}
-                  \${row('Email',            \`<a href="mailto:\${email}" style="color:#D6AF00;">\${email}</a>\`)}
-                  \${phone ? row('Phone', phone) : ''}
-                  \${row('Position',         position)}
-                  \${row('Availability',     availability)}
-                  \${experienceHtml}
-                  \${row('Message',          message?.replace(/\\n/g, '<br/>'))}
+                  ${row('Name', name)}
+                  ${row('Email', `<a href="mailto:${email}" style="color:#D6AF00;">${email}</a>`)}
+                  ${phone ? row('Phone', phone) : ''}
+                  ${row('Position', position)}
+                  ${row('Availability', availability)}
+                  ${experienceHtml}
+                  ${row('Message', message?.replace(/\n/g, '<br/>'))}
                 </table>
 
                 <p style="margin-top:36px;font-size:10px;color:rgba(214,175,0,0.45);text-align:center;letter-spacing:0.2em;text-transform:uppercase;">
@@ -303,9 +333,9 @@ export default buildConfig({
 
             try {
               await req.payload.sendEmail({
-                to:      'careers@thehiddenkitchen62.com',
+                to: 'careers@thehiddenkitchen62.com',
                 replyTo: email,
-                subject: `[New Career App: \${position}] \${name}`,
+                subject: `[New Career App: ${position}] ${name}`,
                 html,
               })
             } catch (err) {
@@ -416,8 +446,8 @@ export default buildConfig({
             const row = (label: string, value: string | undefined) =>
               value
                 ? `<tr>
-                    <td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#D6AF00;width:160px;vertical-align:top;">\${label}</td>
-                    <td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:14px;color:#ffffff;vertical-align:top;line-height:1.5;">\${value}</td>
+                    <td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#D6AF00;width:160px;vertical-align:top;">${label}</td>
+                    <td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:14px;color:#ffffff;vertical-align:top;line-height:1.5;">${value}</td>
                   </tr>`
                 : ''
 
@@ -426,17 +456,17 @@ export default buildConfig({
                 <div style="text-align:center;margin-bottom:32px;">
                   <p style="font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#D6AF00;margin:0 0 8px;">The Hidden Kitchen</p>
                   <h1 style="font-size:26px;font-weight:900;text-transform:uppercase;margin:0;color:#ffffff;letter-spacing:-0.02em;">New Reservation Request</h1>
-                  <p style="margin:10px 0 0;font-size:13px;color:#D6AF00;letter-spacing:0.05em;">\${date} at \${time} for \${partySize}</p>
+                  <p style="margin:10px 0 0;font-size:13px;color:#D6AF00;letter-spacing:0.05em;">${date} at ${time} for ${partySize}</p>
                 </div>
 
                 <table style="width:100%;border-collapse:collapse;">
-                  \${row('Name', name)}
-                  \${row('Email', \`<a href="mailto:\${email}" style="color:#D6AF00;">\${email}</a>\`)}
-                  \${row('Phone', phone)}
-                  \${row('Party Size', String(partySize))}
-                  \${row('Date', date)}
-                  \${row('Time', time)}
-                  \${specialRequests ? row('Special Requests', specialRequests.replace(/\\n/g, '<br/>')) : ''}
+                  ${row('Name', name)}
+                  ${row('Email', `<a href="mailto:${email}" style="color:#D6AF00;">${email}</a>`)}
+                  ${row('Phone', phone)}
+                  ${row('Party Size', String(partySize))}
+                  ${row('Date', date)}
+                  ${row('Time', time)}
+                  ${specialRequests ? row('Special Requests', specialRequests.replace(/\n/g, '<br/>')) : ''}
                 </table>
 
                 <p style="margin-top:36px;font-size:10px;color:rgba(214,175,0,0.45);text-align:center;letter-spacing:0.2em;text-transform:uppercase;">
@@ -449,7 +479,7 @@ export default buildConfig({
               await req.payload.sendEmail({
                 to: 'reservations@thehiddenkitchen62.com',
                 replyTo: email,
-                subject: `[Reservation Request] \${date} - \${name} (\${partySize} guests)`,
+                subject: `[Reservation Request] ${date} - ${name} (${partySize} guests)`,
                 html,
               })
             } catch (err) {
@@ -475,6 +505,7 @@ export default buildConfig({
             { label: 'Confirmed', value: 'confirmed' },
             { label: 'Completed', value: 'completed' },
             { label: 'Cancelled', value: 'cancelled' },
+            { label: 'Scheduled', value: 'scheduled' },
           ],
         },
       ],
@@ -487,56 +518,99 @@ export default buildConfig({
         read: () => true,
       },
       labels: {
-        singular: 'The Stage',
-        plural: 'The Stage',
+        singular: 'Stage Act / Event',
+        plural: 'The Stage Lineup',
       },
       admin: {
         useAsTitle: 'act',
+        defaultColumns: ['act', 'day', 'category', 'socialUrl', 'facebookUrl'],
+        group: 'Stage & Content',
       },
       fields: [
         {
+          name: 'act',
+          label: 'Act / Performer Name',
+          type: 'text',
+          required: true,
+        },
+        {
+          name: 'socialUrl',
+          label: 'Act Social / Web Page Link',
+          type: 'text',
+          admin: {
+            description: 'URL opened when clicking the act name (e.g. Instagram, Spotify, Website)',
+          },
+        },
+        {
+          name: 'facebookUrl',
+          label: 'Facebook Event / RSVP Link',
+          type: 'text',
+          admin: {
+            description: 'URL opened when clicking the RSVP button (Facebook Event)',
+          },
+        },
+        {
           name: 'day',
+          label: 'Display Date (e.g. Jul 22)',
           type: 'text',
           required: true,
         },
         {
           name: 'weekday',
+          label: 'Weekday (0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat)',
           type: 'number',
           min: 0,
           max: 6,
           required: true,
+          defaultValue: 3,
         },
         {
-          name: 'act',
-          type: 'text',
+          name: 'hour',
+          label: 'Start Hour 24h (e.g. 17 for 5:00 PM)',
+          type: 'number',
           required: true,
+          defaultValue: 17,
+        },
+        {
+          name: 'dateStr',
+          label: 'Full Date (YYYY-MM-DD)',
+          type: 'text',
+          admin: {
+            description: 'Required for calendar export & countdown (e.g. 2026-07-22)',
+          },
+        },
+        {
+          name: 'monthKey',
+          label: 'Month Key',
+          type: 'select',
+          defaultValue: 'JUL',
+          options: [
+            { label: 'July', value: 'JUL' },
+            { label: 'August', value: 'AUG' },
+            { label: 'September', value: 'SEP' },
+            { label: 'October', value: 'OCT' },
+            { label: 'November', value: 'NOV' },
+            { label: 'December', value: 'DEC' },
+          ],
         },
         {
           name: 'category',
+          label: 'Category',
           type: 'select',
           defaultValue: 'Live Music',
           options: [
-            { label: 'Live Music',      value: 'Live Music'      },
+            { label: 'Live Music', value: 'Live Music' },
             { label: 'Stand-Up Comedy', value: 'Stand-Up Comedy' },
-            { label: 'Trivia Night',    value: 'Trivia Night'    },
-            { label: 'Special Event',   value: 'Special Event'   },
-            { label: 'Storytelling',    value: 'Storytelling'    },
-            { label: 'Watch Party',     value: 'Watch Party'     },
+            { label: 'Trivia Night', value: 'Trivia Night' },
+            { label: 'Special Event', value: 'Special Event' },
+            { label: 'Storytelling', value: 'Storytelling' },
+            { label: 'Watch Party', value: 'Watch Party' },
           ],
         },
         {
           name: 'genre',
+          label: 'Genre / Subtitle',
           type: 'text',
-        },
-        {
-          name: 'facebookUrl',
-          label: 'Facebook Event URL',
-          type: 'text',
-        },
-        {
-          name: 'hour',
-          type: 'number',
-          required: true,
         },
       ],
     },
@@ -548,39 +622,58 @@ export default buildConfig({
         read: () => true,
       },
       labels: {
-        singular: 'The Menu',
+        singular: 'Menu Category',
         plural: 'The Menu',
       },
       admin: {
         useAsTitle: 'title',
+        defaultColumns: ['title', 'key', 'sortOrder', 'bannerNote'],
+        group: 'Menu & Food',
       },
       fields: [
         {
           name: 'key',
+          label: 'Category Key (slug)',
           type: 'text',
           required: true,
           unique: true,
         },
         {
           name: 'title',
+          label: 'Category Title (e.g. Starters, Pastas)',
           type: 'text',
           required: true,
         },
         {
+          name: 'sortOrder',
+          label: 'Display Sort Order (1, 2, 3...)',
+          type: 'number',
+          defaultValue: 1,
+        },
+        {
           name: 'bannerNote',
+          label: 'Category Subtitle / Banner Note',
           type: 'text',
         },
         {
           name: 'items',
+          label: 'Menu Items',
           type: 'array',
           fields: [
             {
               name: 'name',
+              label: 'Item Name',
               type: 'text',
               required: true,
             },
             {
               name: 'note',
+              label: 'Description / Details',
+              type: 'textarea',
+            },
+            {
+              name: 'price',
+              label: 'Price (optional)',
               type: 'text',
             },
           ],

@@ -2,11 +2,12 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { useEffect, useState, useRef } from 'react'
-import { X, Search, Utensils, ArrowRight, Phone } from 'lucide-react'
+import { X, Search, Utensils, Phone } from 'lucide-react'
 
 type Item = {
   name: string
   note: string
+  price?: string
 }
 
 type Panel = {
@@ -16,7 +17,7 @@ type Panel = {
   items: Item[]
 }
 
-const panels: Panel[] = [
+const defaultPanels: Panel[] = [
   {
     key: 'starters',
     title: 'Starters',
@@ -102,11 +103,46 @@ const panels: Panel[] = [
   },
 ]
 
+export function useMenuData() {
+  const [panels, setPanels] = useState<Panel[]>(defaultPanels)
+
+  useEffect(() => {
+    async function loadCMS() {
+      try {
+        const res = await fetch('/api/menu?limit=100&sort=sortOrder', { cache: 'no-store' })
+        if (!res.ok) return
+        const json = await res.json()
+        if (json.docs && Array.isArray(json.docs) && json.docs.length > 0) {
+          const cmsPanels: Panel[] = json.docs.map((doc: any) => ({
+            key: doc.key || doc.title.toLowerCase().replace(/\s+/g, '-'),
+            title: doc.title || '',
+            bannerNote: doc.bannerNote || '',
+            items: Array.isArray(doc.items)
+              ? doc.items.map((it: any) => ({
+                name: it.name || '',
+                note: it.note || '',
+                price: it.price || undefined,
+              }))
+              : [],
+          }))
+          setPanels(cmsPanels)
+        }
+      } catch {
+        // Fallback to defaultPanels
+      }
+    }
+    loadCMS()
+  }, [])
+
+  return panels
+}
+
 export function Menu() {
   const [isOpen, setIsOpen] = useState(false)
   const [activeCategory, setActiveCategory] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState<string>('')
   const modalContentRef = useRef<HTMLDivElement>(null)
+  const panels = useMenuData()
 
   // Lock scroll when modal is open
   useEffect(() => {
@@ -160,41 +196,42 @@ export function Menu() {
     <>
       <section
         id="menu"
-        className="relative z-20 w-full min-h-[55vh] md:min-h-[65vh] py-14 md:py-20 flex flex-col items-center justify-center bg-black overflow-hidden px-6 md:px-12"
+        className="relative z-20 w-full min-h-screen py-16 md:py-24 flex flex-col items-center justify-center bg-black overflow-x-clip px-6 md:px-12"
       >
-      {/* ── Background Video System (Ultra-Smooth Dark Blended) ───── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10 bg-black">
-        {/* Single Full-Viewport Atmospheric Background Video */}
-        <video
-          src="/videos/the_menu.mp4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 h-full w-full object-cover opacity-45 contrast-105 saturate-95 pointer-events-none select-none"
-        />
+        {/* ── Background Video System (Edge-to-Edge Bleed) ───── */}
+        <div className="absolute inset-0 pointer-events-none -z-10">
+          <div className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-black">
+            {/* Full-Viewport Background Video */}
+            <video
+              src="/videos/the_menu.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              onError={(e) => {
+                e.currentTarget.style.display = 'none'
+              }}
+              className="absolute inset-0 h-full w-full object-cover opacity-80 contrast-110 saturate-110 scale-105 pointer-events-none select-none"
+            />
 
-        {/* Global Dark Tint Overlay Layer */}
-        <div className="absolute inset-0 bg-black/55 pointer-events-none" />
-
-        {/* Continuous Full-Width Horizontal Fade */}
-        <div className="absolute inset-0 bg-gradient-to-r from-black via-black/60 to-transparent pointer-events-none" />
-
-        {/* Ultra-Smooth Top & Bottom Vignettes — seamless natural flow into surrounding sections */}
-        <div className="absolute inset-x-0 top-0 h-20 md:h-28 bg-gradient-to-b from-black via-black/60 to-transparent pointer-events-none" />
-        <div className="absolute inset-x-0 bottom-0 h-20 md:h-28 bg-gradient-to-t from-black via-black/60 to-transparent pointer-events-none" />
-      </div>
-      {/* ── End Background Video System ──────────────────────────────────── */}
+            {/* Dynamic Radial Vignette: Darkens center behind headline while leaving top/bottom open */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-black/80 via-black/40 to-transparent pointer-events-none" />
+          </div>
+          
+          {/* Top & Bottom Vignettes for seamless transitions (placed OUTSIDE sticky) */}
+          <div className="absolute inset-x-0 top-0 h-24 md:h-32 bg-gradient-to-b from-black to-transparent pointer-events-none" />
+          <div className="absolute inset-x-0 bottom-0 h-24 md:h-32 bg-gradient-to-t from-black to-transparent pointer-events-none" />
+        </div>
 
         <div className="relative z-10 flex flex-col items-center mx-auto w-full max-w-[100vw]">
           {/* Main Headline Line 1 */}
-          <h2 className="text-center text-[24vw] sm:text-[22vw] md:text-[20vw] lg:text-[18vw] xl:text-[17vw] 2xl:text-[250px] font-black uppercase leading-[0.8] tracking-tighter text-foreground whitespace-nowrap">
+          <h2 className="text-center text-[24vw] sm:text-[22vw] md:text-[20vw] lg:text-[18vw] xl:text-[17vw] 2xl:text-[250px] font-black uppercase leading-[0.8] tracking-tighter text-foreground whitespace-nowrap drop-shadow-[0_8px_32px_rgba(0,0,0,0.95)]">
             Eat like
           </h2>
 
           {/* Line 2 & Links Wrapper */}
           <div className="flex flex-col items-stretch w-max max-w-full">
-            <h2 className="text-center text-[24vw] sm:text-[22vw] md:text-[20vw] lg:text-[18vw] xl:text-[17vw] 2xl:text-[250px] font-black uppercase leading-[0.8] tracking-tighter text-foreground whitespace-nowrap">
+            <h2 className="text-center text-[24vw] sm:text-[22vw] md:text-[20vw] lg:text-[18vw] xl:text-[17vw] 2xl:text-[250px] font-black uppercase leading-[0.8] tracking-tighter text-foreground whitespace-nowrap drop-shadow-[0_8px_32px_rgba(0,0,0,0.95)]">
               <span className="gold-shimmer">family.</span>
             </h2>
 
@@ -202,32 +239,26 @@ export function Menu() {
             <div className="mt-8 md:mt-12 flex items-center justify-center w-full gap-3 sm:gap-6 md:gap-8 px-4">
               <button
                 onClick={() => openWithCategory('all')}
-                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black uppercase tracking-widest text-neutral-300 transition-colors duration-300 hover:text-gold whitespace-nowrap"
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black uppercase tracking-widest text-neutral-100 transition-all duration-300 hover:text-gold hover:scale-105 whitespace-nowrap drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]"
               >
                 View Menu
               </button>
 
-              <span className="text-gold/50 font-light select-none text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl" aria-hidden>
+              <span className="text-gold font-light select-none text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]" aria-hidden>
                 |
               </span>
 
               <a
-                href="tel:+16186814208"
-                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black uppercase tracking-widest text-neutral-300 transition-colors duration-300 hover:text-gold whitespace-nowrap"
+                href="https://www.doordash.com/store/the-hidden-kitchen-carterville-47996853"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-black uppercase tracking-widest text-neutral-100 transition-all duration-300 hover:text-gold hover:scale-105 whitespace-nowrap drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]"
               >
                 Order Delivery
               </a>
             </div>
           </div>
         </div>
-
-        {/* ── BOTTOM SEAM SEAL ───────────────────────────────────────────
-            z-[5]: sits ABOVE all bg layers, guarantees smooth blend into Stage
-        ──────────────────────────────────────────────────────────────── */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-20 pointer-events-none z-[5] bg-gradient-to-t from-black via-black/80 to-transparent"
-        />
       </section>
 
       {/* Full Screen Menu Modal Overlay */}
@@ -268,7 +299,6 @@ export function Menu() {
 
               {/* Search & Category Navigation Bar */}
               <div className="mt-5 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                {/* Search Bar */}
                 <div className="relative w-full md:w-72 shrink-0">
                   <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gold/60" />
                   <input
@@ -288,15 +318,13 @@ export function Menu() {
                   )}
                 </div>
 
-                {/* Category Filter Tabs */}
                 <div className="no-scrollbar flex items-center gap-2 overflow-x-auto pb-1 md:pb-0">
                   <button
                     onClick={() => setActiveCategory('all')}
-                    className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
-                      activeCategory === 'all'
+                    className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${activeCategory === 'all'
                         ? 'bg-gold text-black shadow-[0_0_15px_rgba(197,163,104,0.4)]'
                         : 'border border-gold/20 bg-black/40 text-foreground/70 hover:border-gold/50 hover:text-foreground'
-                    }`}
+                      }`}
                   >
                     All Items
                   </button>
@@ -305,11 +333,10 @@ export function Menu() {
                     <button
                       key={panel.key}
                       onClick={() => setActiveCategory(panel.key)}
-                      className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
-                        activeCategory === panel.key
+                      className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${activeCategory === panel.key
                           ? 'bg-gold text-black shadow-[0_0_15px_rgba(197,163,104,0.4)]'
                           : 'border border-gold/20 bg-black/40 text-foreground/70 hover:border-gold/50 hover:text-foreground'
-                      }`}
+                        }`}
                     >
                       {panel.title}
                     </button>
@@ -318,7 +345,7 @@ export function Menu() {
               </div>
             </div>
 
-            {/* Modal Body: Scrollable Menu Grid */}
+            {/* Modal Body */}
             <div
               ref={modalContentRef}
               className="flex-1 overflow-y-auto px-6 py-8 md:px-16 lg:px-24 xl:px-32 scroll-smooth"
@@ -346,7 +373,6 @@ export function Menu() {
                       transition={{ duration: 0.4 }}
                       className="relative rounded-2xl border border-gold/15 bg-black/50 p-6 md:p-10 backdrop-blur-md"
                     >
-                      {/* Section Title Header */}
                       <div className="border-b border-gold/20 pb-4 mb-6">
                         <h4 className="text-3xl font-black uppercase tracking-tight text-foreground sm:text-4xl">
                           {panel.title}
@@ -358,7 +384,6 @@ export function Menu() {
                         )}
                       </div>
 
-                      {/* Items Grid */}
                       <div className="grid gap-6 md:grid-cols-2">
                         {panel.items.map((item, idx) => (
                           <motion.div
@@ -372,6 +397,11 @@ export function Menu() {
                               <h5 className="font-bold tracking-tight text-white text-lg md:text-xl transition-colors group-hover:text-gold">
                                 {item.name}
                               </h5>
+                              {item.price && (
+                                <span className="font-sans text-sm font-bold text-gold shrink-0">
+                                  {item.price}
+                                </span>
+                              )}
                             </div>
                             <p className="text-sm leading-relaxed text-white/80 font-sans">
                               {item.note}
@@ -383,7 +413,6 @@ export function Menu() {
                   ))
                 )}
 
-                {/* Modal Footer Callout */}
                 <div className="mt-12 rounded-2xl border border-gold/20 bg-gradient-to-r from-gold/10 via-black to-gold/10 p-8 text-center flex flex-col items-center gap-4">
                   <h5 className="text-xl font-bold uppercase tracking-wider text-white">
                     Ready to Enjoy?
@@ -407,3 +436,5 @@ export function Menu() {
     </>
   )
 }
+
+export default Menu

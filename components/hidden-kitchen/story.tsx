@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 
 const reveal = {
   hidden: { opacity: 0, y: 30 },
@@ -15,40 +16,36 @@ export function Story() {
   return (
     <section
       id="story"
-      className="relative overflow-hidden bg-black w-full flex flex-col justify-center items-center py-12 md:py-16 lg:py-20"
+      className="relative overflow-x-clip bg-black w-full flex flex-col justify-center items-center py-12 md:py-16 lg:py-20"
     >
-      {/* ── Background System (Ultra-Smooth Dark Blended Family Photo) ──────────── */}
-      <div className="absolute inset-0 pointer-events-none select-none z-0 overflow-hidden bg-black">
-        {/* Family photo wrapper - framed so all family members sit clearly on the right side */}
-        <div className="absolute right-0 top-0 bottom-0 w-[70%] sm:w-[62%] md:w-[58%] lg:w-[55%] xl:w-[54%] pointer-events-none [mask-image:linear-gradient(to_right,transparent_0%,black_20%,black_100%)] [-webkit-mask-image:linear-gradient(to_right,transparent_0%,black_20%,black_100%)]">
-          <img
-            src="/images/family.jpg"
-            alt=""
+      {/* ── Background System (Vintage Documentary Photo) ──────────── */}
+      <div className="absolute inset-0 pointer-events-none select-none z-0">
+        <div className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-black">
+          
+          {/* Ambient Warmth Background (Animated Gold/Amber Glow) */}
+          <div className="absolute inset-0 bg-black overflow-hidden">
+            {/* Right side gold glow */}
+            <div className="absolute top-[-10%] right-[-5%] w-[80vw] h-[80vw] rounded-full bg-[radial-gradient(circle,_rgba(214,175,0,0.4)_0%,_transparent_60%)] blur-[100px] animate-pulse" style={{ animationDuration: '8s' }} />
+            
+            {/* Left side amber glow */}
+            <div className="absolute bottom-[-10%] left-[0%] w-[60vw] h-[60vw] rounded-full bg-[radial-gradient(circle,_rgba(184,115,51,0.3)_0%,_transparent_60%)] blur-[100px] animate-pulse" style={{ animationDuration: '12s' }} />
+          </div>
+
+          {/* Soft vignette on the left to ensure text readability */}
+          <div
             aria-hidden="true"
-            className="h-full w-full object-cover object-[32%_20%] opacity-55 contrast-105 saturate-105 select-none"
+            className="absolute inset-0 pointer-events-none bg-gradient-to-r from-black/80 via-black/30 to-transparent"
           />
         </div>
 
-        {/* Global Dark Tint Overlay Layer (matching video sections) */}
+        {/* Top & Bottom Vignettes for seamless transitions (placed OUTSIDE sticky) */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 pointer-events-none bg-black/45"
-        />
-
-        {/* Continuous Full-Width Horizontal Fade — protects left header column while leaving family fully visible */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 pointer-events-none bg-gradient-to-r from-black via-black/80 via-35% to-transparent"
-        />
-
-        {/* Ultra-Smooth Top & Bottom Vignettes — seamless natural flow into surrounding sections */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-x-0 top-0 h-20 md:h-28 pointer-events-none bg-gradient-to-b from-black via-black/60 to-transparent"
+          className="absolute inset-x-0 top-0 h-20 md:h-28 pointer-events-none bg-gradient-to-b from-black to-transparent"
         />
         <div
           aria-hidden="true"
-          className="absolute inset-x-0 bottom-0 h-20 md:h-28 pointer-events-none bg-gradient-to-t from-black via-black/60 to-transparent"
+          className="absolute inset-x-0 bottom-0 h-20 md:h-28 pointer-events-none bg-gradient-to-t from-black to-transparent"
         />
       </div>
 
@@ -88,11 +85,26 @@ export function Story() {
             We don&apos;t do velvet ropes or exclusive handshakes. Our only mission is to give everyone a space where they truly belong. From the local talent at our weekly live music to the comfort on your plate, everything we do is about bringing people together.
           </p>
 
-          <div className="pt-2 border-l-2 border-gold/80 pl-4">
+          <div className="pt-2 border-l-2 border-gold/80 pl-4 mb-10">
             <p className="text-pretty text-lg font-bold leading-snug tracking-tight text-white md:text-xl font-sans">
               Strangers become regulars. Regulars become family.{' '}
               <span className="gold-shimmer inline-block pr-2">That&apos;s the whole plan.</span>
             </p>
+          </div>
+          
+          {/* Editorial Family Photo Frame */}
+          <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] lg:aspect-[4/3] xl:aspect-[16/9] rounded-sm overflow-hidden border border-gold/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] group">
+            <Image
+              src="/images/family.jpg"
+              alt="The Hidden Kitchen family and staff"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              unoptimized
+              className="h-full w-full object-cover object-[center_20%] transition-transform duration-1000 group-hover:scale-105 filter grayscale sepia-[0.2] contrast-110"
+            />
+            {/* Subtle vintage overlay on the photo */}
+            <div className="absolute inset-0 bg-gold/10 mix-blend-overlay pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
           </div>
         </motion.div>
       </div>
@@ -100,3 +112,4 @@ export function Story() {
   )
 }
 
+export default Story

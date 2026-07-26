@@ -1,9 +1,9 @@
 'use client'
 
 import { motion, useScroll, useTransform } from 'framer-motion'
-
+import Image from 'next/image'
 import { Phone, MapPin } from 'lucide-react'
-import { useBusinessStatus } from './live-status'
+import { useBusinessStatus } from '@/components/hidden-kitchen/live-status'
 
 export function Hero() {
   const { scrollY } = useScroll()
@@ -15,13 +15,21 @@ export function Hero() {
 
   const status = useBusinessStatus()
 
+  const scrollToVisit = () => {
+    const el = document.getElementById('visit')
+    if (el) {
+      const headerOffset = window.innerWidth < 768 ? 64 : 80
+      const elementPosition = el.getBoundingClientRect().top
+      const offsetPosition = elementPosition + window.pageYOffset - headerOffset
+      window.scrollTo({ top: offsetPosition, behavior: 'smooth' })
+    }
+  }
+
   return (
     <section
       id="top"
       className="sticky top-0 z-0 flex h-[100dvh] min-h-[540px] w-full items-center justify-center overflow-hidden bg-black"
     >
-
-
       {/* Center logo */}
       <motion.div
         style={{ scale: titleScale, opacity: titleOpacity }}
@@ -35,9 +43,12 @@ export function Hero() {
           transition={{ delay: 0.2, duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
           className="relative max-w-[85vw] w-[240px] sm:w-[380px] md:w-[500px] lg:w-[600px] xl:w-[680px] 2xl:w-[740px] max-h-[42vh] sm:max-h-[46vh] md:max-h-[48vh] aspect-[1300/842]"
         >
-          <img
+          <Image
             src="/logo.svg"
             alt="The Hidden Kitchen Logo"
+            fill
+            priority
+            unoptimized
             className="w-full h-full max-h-[42vh] sm:max-h-[46vh] md:max-h-[48vh] object-contain"
           />
         </motion.div>
@@ -54,9 +65,13 @@ export function Hero() {
           transition={{ delay: 0.6, duration: 0.9 }}
           className="mx-auto flex max-w-xl xl:max-w-2xl flex-col items-center gap-3 sm:gap-4 xl:gap-5 px-6"
         >
-          {/* Live status */}
+          {/* Live status line — seamless, borderless, single-line across all screen sizes, links to Hours (#visit) */}
           {status && (
-            <div className="flex items-center gap-2 text-[11px] xl:text-[13px] uppercase tracking-[0.3em]">
+            <button
+              onClick={scrollToVisit}
+              className="group flex items-center justify-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] xl:text-[13px] uppercase tracking-[0.2em] sm:tracking-[0.3em] transition-colors duration-300 cursor-pointer whitespace-nowrap"
+              title="Click to view complete Location & Hours"
+            >
               <span className="relative flex h-2 w-2 shrink-0">
                 {status.isOpen && (
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
@@ -66,14 +81,14 @@ export function Hero() {
                     }`}
                 />
               </span>
-              <span className="font-bold text-foreground/90">
-                {status.isOpen ? 'Open' : 'Closed'}
+              <span className="font-bold text-foreground/90 group-hover:text-gold transition-colors">
+                {status.label}
               </span>
               <span className="text-foreground/30">—</span>
-              <span className="font-medium text-foreground/50">
+              <span className="font-medium text-foreground/60 group-hover:text-gold/80 transition-colors">
                 {status.detail}
               </span>
-            </div>
+            </button>
           )}
 
           {/* CTA row — understated text-links with subtle divider */}
@@ -103,3 +118,5 @@ export function Hero() {
     </section>
   )
 }
+
+export default Hero

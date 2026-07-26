@@ -20,6 +20,7 @@ import {
   Lock,
 } from 'lucide-react'
 import { useLineupData, type Show } from '@/components/hidden-kitchen/lineup'
+import { Footer } from '@/components/hidden-kitchen/footer'
 
 // ── Category definitions ──────────────────────────────────────────────────────
 type Category = 'live-music' | 'comedy' | 'private-event' | 'community' | ''
@@ -782,6 +783,9 @@ export default function BookTheStagePage() {
           </main>
 
         </div>
+        
+        {/* Global Footer */}
+        <Footer />
       </div>
     </div>
   )

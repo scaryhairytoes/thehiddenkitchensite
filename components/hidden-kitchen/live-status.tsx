@@ -11,128 +11,116 @@ export type BusinessStatus = {
 
 export function getBusinessStatus(nowDate: Date = new Date()): BusinessStatus {
   try {
-    const chicagoTimeStr = nowDate.toLocaleString('en-US', { timeZone: 'America/Chicago' })
-    const chicagoDate = new Date(chicagoTimeStr)
+    // Extract Chicago/Carterville local time parts safely via Intl.DateTimeFormat
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Chicago',
+      weekday: 'short',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+    })
 
-    const day = chicagoDate.getDay() // 0 = Sun, 1 = Mon, ..., 6 = Sat
-    const hours = chicagoDate.getHours()
-    const minutes = chicagoDate.getMinutes()
+    const parts = formatter.formatToParts(nowDate)
+    let weekdayStr = ''
+    let hours = 0
+    let minutes = 0
+
+    for (const part of parts) {
+      if (part.type === 'weekday') weekdayStr = part.value
+      if (part.type === 'hour') hours = parseInt(part.value, 10)
+      if (part.type === 'minute') minutes = parseInt(part.value, 10)
+    }
+
+    // Map weekday string to numeric index: 0 = Sun, 1 = Mon, 2 = Tue, ..., 6 = Sat
+    const weekdayMap: Record<string, number> = {
+      Sun: 0,
+      Mon: 1,
+      Tue: 2,
+      Wed: 3,
+      Thu: 4,
+      Fri: 5,
+      Sat: 6,
+    }
+    const day = weekdayMap[weekdayStr] ?? nowDate.getDay()
+
+    // Handle 24-hour formatting edge case (24 -> 0)
+    if (hours === 24) hours = 0
+
     const currentMin = hours * 60 + minutes
 
     const openMin = 11 * 60 // 11:00 AM
-    const closeMin = 24 * 60 // 12:00 AM Midnight
+    const kitchenCloseMin = 20 * 60 // 8:00 PM
+    const barCloseMin = 24 * 60 // 12:00 AM Midnight
 
-    // Monday is closed
+    // Monday is completely closed
     if (day === 1) {
       return {
         isOpen: false,
-        label: 'CLOSED NOW',
+        label: 'Closed',
         detail: 'Opens Tue at 11 AM',
-        nextOpenText: 'Opens Tuesday at 11 AM',
+        nextOpenText: 'Opens Tuesday at 11:00 AM',
       }
     }
 
-    // Tue - Sun: Open 11 AM to 12 AM Midnight
-    if (currentMin >= openMin && currentMin < closeMin) {
+    // Both Kitchen and Bar open (11:00 AM - 8:00 PM)
+    if (currentMin >= openMin && currentMin < kitchenCloseMin) {
       return {
         isOpen: true,
-        label: 'OPEN NOW',
-        detail: 'Kitchen \'til 8PM · Bar \'til Midnight',
-        nextOpenText: 'Open Today until Midnight',
+        label: 'Open',
+        detail: 'Kitchen til 8 PM · Bar til Midnight',
+        nextOpenText: 'Kitchen open until 8:00 PM',
       }
-    } else if (currentMin < openMin) {
-      // Earlier today before 11 AM
+    }
+
+    // Bar only open (8:00 PM - Midnight)
+    if (currentMin >= kitchenCloseMin && currentMin < barCloseMin) {
+      return {
+        isOpen: true,
+        label: 'Bar Open',
+        detail: 'Kitchen closed at 8 PM · Bar til Midnight',
+        nextOpenText: 'Bar open until Midnight',
+      }
+    }
+
+    // Closed early morning before 11 AM
+    if (currentMin < openMin) {
       return {
         isOpen: false,
-        label: 'CLOSED NOW',
-        detail: 'Opens Today at 11 AM',
-        nextOpenText: 'Opens Today at 11 AM',
+        label: 'Closed',
+        detail: 'Opens today at 11 AM',
+        nextOpenText: 'Opens today at 11:00 AM',
       }
-    } else {
-      const nextDayName = day === 0 ? 'Tue' : day === 6 ? 'Sun' : 'Tomorrow'
-      return {
-        isOpen: false,
-        label: 'CLOSED NOW',
-        detail: `Opens ${nextDayName} at 11 AM`,
-        nextOpenText: `Opens ${nextDayName} at 11 AM`,
-      }
+    }
+
+    // Closed after Midnight (Sun night / Mon morning transition check)
+    const nextDayLabel = day === 0 ? 'Tue' : 'Tomorrow'
+    return {
+      isOpen: false,
+      label: 'Closed',
+      detail: `Opens ${nextDayLabel} at 11 AM`,
+      nextOpenText: `Opens ${nextDayLabel} at 11:00 AM`,
     }
   } catch {
     return {
-      isOpen: true,
-      label: 'OPEN NOW',
-      detail: 'Kitchen \'til 8PM · Bar \'til Midnight',
-      nextOpenText: 'Open Today',
+      isOpen: false,
+      label: 'Closed',
+      detail: 'Opens at 11 AM',
+      nextOpenText: 'Opens at 11:00 AM',
     }
   }
 }
 
 export function useBusinessStatus() {
-  const [status, setStatus] = useState<BusinessStatus | null>(null)
+  const [status, setStatus] = useState<BusinessStatus>(() => getBusinessStatus())
 
   useEffect(() => {
-    const tick = () => {
-      setStatus(getBusinessStatus(new Date()))
-    }
-    tick()
-    const interval = setInterval(tick, 30000)
+    const update = () => setStatus(getBusinessStatus())
+    update()
+    const interval = setInterval(update, 60000)
     return () => clearInterval(interval)
   }, [])
 
   return status
 }
 
-export function LiveStatusPill({ compact = false }: { compact?: boolean }) {
-  const status = useBusinessStatus()
-
-  if (!status) {
-    return (
-      <div className="h-7 w-32 rounded-full bg-gold/10 animate-pulse" aria-hidden />
-    )
-  }
-
-  if (compact) {
-    return (
-      <div className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-black/80 px-3 py-1 text-[11px] backdrop-blur-md shadow-md">
-        <span className="relative flex h-2 w-2">
-          {status.isOpen && (
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-          )}
-          <span
-            className={`relative inline-flex h-2 w-2 rounded-full ${
-              status.isOpen ? 'bg-emerald-500' : 'bg-amber-500'
-            }`}
-          />
-        </span>
-        <span className="font-bold tracking-wider text-foreground">
-          {status.label}
-        </span>
-      </div>
-    )
-  }
-
-  return (
-    <div className="inline-flex items-center gap-2.5 rounded-full border border-gold/30 bg-black/85 px-4 py-1.5 backdrop-blur-md shadow-xl text-xs">
-      <span className="relative flex h-2.5 w-2.5 shrink-0">
-        {status.isOpen && (
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-        )}
-        <span
-          className={`relative inline-flex h-2.5 w-2.5 rounded-full ${
-            status.isOpen ? 'bg-emerald-500' : 'bg-amber-500'
-          }`}
-        />
-      </span>
-
-      <span className="font-black uppercase tracking-widest text-foreground">
-        {status.label}
-      </span>
-
-      <span className="text-gold/40">•</span>
-
-      <span className="font-medium text-muted-foreground">
-        {status.detail}
-      </span>
-    </div>
-  )
-}
+export default useBusinessStatus

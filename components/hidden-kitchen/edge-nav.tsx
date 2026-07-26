@@ -1,12 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { Menu as MenuIcon, X, Phone, MapPin } from 'lucide-react'
 
 const SECTIONS = [
   { id: 'story', label: 'The Story' },
-  { id: 'menu',  label: 'The Menu'  },
+  { id: 'menu', label: 'The Menu' },
   { id: 'stage', label: 'The Stage' },
   { id: 'visit', label: 'The Details' },
 ]
@@ -29,10 +30,8 @@ export function EdgeNav() {
   const { scrollY } = useScroll()
   const logoOpacity = useTransform(scrollY, [100, 300], [0, 1])
 
-  // Scroll-spy: highlight nav link matching the section in view (cleared in hero section)
   useEffect(() => {
     const handleScroll = () => {
-      // Hero section check: if in top half of screen before story, clear highlight
       const storyEl = document.getElementById('story')
       const heroThreshold = storyEl ? storyEl.offsetTop - 120 : window.innerHeight * 0.6
 
@@ -97,58 +96,45 @@ export function EdgeNav() {
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-[80] w-full h-16 md:h-20 bg-black transition-all duration-300">
-
-        {/* Desktop nav — 5-column grid: [Story] [Menu] [center-spacer] [Stage] [Details] */}
-        {/* The center spacer reserves the logo footprint and pushes inner links apart */}
         <div
           className="hidden md:grid w-full h-full items-center px-6 lg:px-10 xl:px-16"
           style={{ gridTemplateColumns: '1fr 1fr clamp(240px, 25vw, 360px) 1fr 1fr' }}
         >
-          {/* THE STORY — outer left */}
           <button
             onClick={() => go('story')}
-            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
-              active === 'story' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
-            }`}
+            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${active === 'story' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+              }`}
           >
             The Story
           </button>
 
-          {/* THE MENU — inner left, pushed left by center spacer */}
           <button
             onClick={() => go('menu')}
-            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
-              active === 'menu' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
-            }`}
+            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${active === 'menu' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+              }`}
           >
             The Menu
           </button>
 
-          {/* Center spacer — logo floats here via absolute positioning */}
           <div aria-hidden />
 
-          {/* THE STAGE — inner right, pushed right by center spacer */}
           <button
             onClick={() => go('stage')}
-            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
-              active === 'stage' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
-            }`}
+            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${active === 'stage' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+              }`}
           >
             The Stage
           </button>
 
-          {/* THE DETAILS — outer right */}
           <button
             onClick={() => go('visit')}
-            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${
-              active === 'visit' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
-            }`}
+            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${active === 'visit' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+              }`}
           >
             The Details
           </button>
         </div>
 
-        {/* Mobile Navbar */}
         <div className="flex md:hidden w-full h-full items-center justify-between px-6">
           <div className="w-10" />
           <button
@@ -163,10 +149,8 @@ export function EdgeNav() {
             )}
           </button>
         </div>
-
       </header>
 
-      {/* Mobile Navigation Menu */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -184,16 +168,14 @@ export function EdgeNav() {
                     go(s.id)
                     setMenuOpen(false)
                   }}
-                  className={`text-xl font-bold uppercase tracking-[0.35em] transition-colors duration-300 ${
-                    active === s.id ? 'text-gold' : 'text-foreground/60 hover:text-gold'
-                  }`}
+                  className={`text-xl font-bold uppercase tracking-[0.35em] transition-colors duration-300 ${active === s.id ? 'text-gold' : 'text-foreground/60 hover:text-gold'
+                    }`}
                 >
                   {s.label}
                 </button>
               ))}
             </div>
 
-            {/* Mobile CTAs */}
             <div className="mt-2 flex items-center gap-5 text-[11px] font-semibold uppercase tracking-[0.25em]">
               <a
                 href="tel:+16186814208"
@@ -215,7 +197,6 @@ export function EdgeNav() {
         )}
       </AnimatePresence>
 
-      {/* Bottom-left scroll hint */}
       <div className="pointer-events-none fixed bottom-4 left-4 z-[70] hidden items-center gap-2 md:flex md:left-6 md:bottom-6">
         <motion.span
           animate={{ opacity: [0.3, 1, 0.3] }}
@@ -226,7 +207,6 @@ export function EdgeNav() {
         </motion.span>
       </div>
 
-      {/* Floating logo symbol — fades in on scroll, click returns to top */}
       <motion.button
         onClick={() => go('top')}
         style={{
@@ -236,17 +216,21 @@ export function EdgeNav() {
           opacity: menuOpen ? 0 : logoOpacity,
         }}
         suppressHydrationWarning
-        className={`fixed left-1/2 -translate-x-1/2 -translate-y-1/2 z-[90] flex items-center justify-center focus:outline-none transition-all duration-300 ${
-          menuOpen ? 'pointer-events-none' : ''
-        }`}
+        className={`fixed left-1/2 -translate-x-1/2 -translate-y-1/2 z-[90] flex items-center justify-center focus:outline-none transition-all duration-300 ${menuOpen ? 'pointer-events-none' : ''
+          }`}
         aria-label="The Hidden Kitchen Symbol — back to top"
       >
-        <img
+        <Image
           src="/logo_only.svg"
           alt="The Hidden Kitchen Symbol"
+          width={56}
+          height={56}
+          unoptimized
           className="w-full h-full object-contain transition-transform duration-300 hover:scale-110"
         />
       </motion.button>
     </>
   )
 }
+
+export default EdgeNav

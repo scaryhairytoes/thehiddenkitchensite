@@ -15,10 +15,16 @@ type Args = {
   }>
 }
 
-export const generateMetadata = ({ params, searchParams }: Args): Promise<Metadata> =>
-  generatePageMetadata({ config: configPromise, params, searchParams })
+export const generateMetadata = ({ params, searchParams }: Args): Promise<Metadata> => {
+  const safeParams = (params ?? Promise.resolve({})).then((p) => p ?? {}) as Promise<{ [key: string]: string | string[] }>
+  const safeSearchParams = (searchParams ?? Promise.resolve({})).then((s) => s ?? {}) as Promise<{ [key: string]: string | string[] }>
+  return generatePageMetadata({ config: configPromise, params: safeParams, searchParams: safeSearchParams })
+}
 
-const Page = ({ params, searchParams }: Args) =>
-  RootPage({ config: configPromise, importMap, params, searchParams })
+const Page = ({ params, searchParams }: Args) => {
+  const safeParams = (params ?? Promise.resolve({})).then((p) => p ?? {}) as Promise<{ segments: string[] }>
+  const safeSearchParams = (searchParams ?? Promise.resolve({})).then((s) => s ?? {}) as Promise<{ [key: string]: string | string[] }>
+  return RootPage({ config: configPromise, importMap, params: safeParams, searchParams: safeSearchParams })
+}
 
 export default Page

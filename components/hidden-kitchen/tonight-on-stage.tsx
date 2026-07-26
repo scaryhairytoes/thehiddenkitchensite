@@ -29,18 +29,22 @@ export function TonightOnStage() {
 
   useEffect(() => {
     const tick = () => {
+      // Pause updates if page is hidden to prevent unnecessary re-renders & save battery
+      if (typeof document !== 'undefined' && document.hidden) return
+
       const now = new Date()
       const ns = getNextShow(now, lineupData)
       setNext(ns)
       setRemaining(ns.target.getTime() - now.getTime())
     }
+
     tick()
     const id = setInterval(tick, 1000)
     return () => clearInterval(id)
   }, [lineupData])
 
   if (!next) {
-    return <div className="h-10 w-full animate-pulse" aria-hidden />
+    return <div className="h-10 w-full animate-pulse bg-white/5 rounded" aria-hidden />
   }
 
   const actName = next.show.act.trim()
@@ -71,7 +75,7 @@ export function TonightOnStage() {
       viewport={{ once: true }}
       className="w-full flex flex-col gap-1 text-xs sm:text-sm py-0.5 select-none"
     >
-      {/* LINE 1: Status indicator + Full Performer Name (Full Width) */}
+      {/* LINE 1: Status indicator + Full Performer Name */}
       <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full overflow-hidden">
         <div className="flex items-center gap-1.5 shrink-0 font-sans font-bold text-[10px] sm:text-xs uppercase tracking-[0.18em]">
           <span className="relative flex h-2 w-2 shrink-0">
@@ -83,16 +87,27 @@ export function TonightOnStage() {
 
         <span className="text-gold/40 shrink-0">·</span>
 
-        {/* Performer / Event Name - Full line headroom */}
-        <span className="font-bold uppercase tracking-tight text-white hover:text-gold transition-colors text-xs sm:text-sm md:text-base leading-tight truncate">
-          {actName}
-        </span>
+        {next.show.socialUrl || next.show.facebookUrl ? (
+          <a
+            href={formatFacebookUrl(next.show.socialUrl || next.show.facebookUrl)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold uppercase tracking-tight text-white hover:text-gold transition-colors text-xs sm:text-sm md:text-base leading-tight truncate flex items-center gap-1"
+            title={`Visit ${actName}'s page`}
+          >
+            <span>{actName}</span>
+            <span className="text-gold text-xs opacity-75">↗</span>
+          </a>
+        ) : (
+          <span className="font-bold uppercase tracking-tight text-white transition-colors text-xs sm:text-sm md:text-base leading-tight truncate">
+            {actName}
+          </span>
+        )}
       </div>
 
-      {/* LINE 2: Date & Time range + Countdown ("Takes stage in ...") + RSVP Button */}
+      {/* LINE 2: Date & Time range + Countdown + RSVP */}
       <div className="flex items-center justify-between gap-2.5 w-full border-t border-white/10 pt-1">
         <div className="flex flex-wrap items-center gap-2 font-sans text-[10px] sm:text-xs text-white/90 min-w-0">
-          {/* Date and Time Range */}
           <span className="font-bold text-white uppercase tracking-wider shrink-0">
             {next.show.day} · {timeRangeStr}
           </span>
@@ -121,3 +136,5 @@ export function TonightOnStage() {
     </motion.div>
   )
 }
+
+export default TonightOnStage
