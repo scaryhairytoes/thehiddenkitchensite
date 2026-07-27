@@ -1,5 +1,6 @@
 import { buildConfig } from 'payload'
 // Payload CMS Configuration - The Hidden Kitchen v2
+import { s3Storage } from '@payloadcms/storage-s3'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
