@@ -25,10 +25,10 @@ const defaultPanels: Panel[] = [
     title: 'Starters',
     bannerNote: 'Perfect for sharing at the table',
     items: [
-      { name: 'Cheese Curds', price: '$9', note: 'Fried cheese curds with ranch sauce' },
-      { name: 'Parmesan French Fries', price: '$9', note: 'Garlic parmesan coated french fries' },
-      { name: 'Crispy Pork Belly Bites', price: '$9', note: 'Kansas City style sweet and savory rub' },
-      { name: 'Bone In Wings', price: '$13', note: 'BBQ, Parmesan Garlic or Hot Sauce' },
+      { name: 'Cheese Curds', note: 'Fried cheese curds with ranch sauce' },
+      { name: 'Parmesan French Fries', note: 'Garlic parmesan coated french fries' },
+      { name: 'Crispy Pork Belly Bites', note: 'Kansas City style sweet and savory rub' },
+      { name: 'Bone In Wings', note: 'BBQ, Parmesan Garlic or Hot Sauce' },
     ],
   },
   {
@@ -36,9 +36,9 @@ const defaultPanels: Panel[] = [
     title: 'Dinner Salads',
     bannerNote: 'Dressings: Homemade Ranch, Italian, French, Blue Cheese, Honey Mustard, Balsamic Vinaigrette, 1000 Island',
     items: [
-      { name: 'Chicken Caesar Salad', price: '$15', note: 'Parmesan, croutons, Caesar dressing. Chicken grilled or fried.' },
-      { name: 'House Salad', price: '$13', note: 'Lettuce, tomatoes, red onion, cheese croutons, & choice of dressing.' },
-      { name: 'Chef Salad', price: '$14', note: 'Ham, bacon, cheese, eggs, tomatoes, sweet peppers, croutons, & choice of dressing.' },
+      { name: 'Chicken Caesar Salad', note: 'Parmesan, croutons, Caesar dressing. Chicken grilled or fried.' },
+      { name: 'House Salad', note: 'Lettuce, tomatoes, red onion, cheese croutons, & choice of dressing.' },
+      { name: 'Chef Salad', note: 'Ham, bacon, cheese, eggs, tomatoes, sweet peppers, croutons, & choice of dressing.' },
     ],
   },
   {
@@ -46,10 +46,10 @@ const defaultPanels: Panel[] = [
     title: 'Sandwiches',
     bannerNote: 'Served alongside choice of French fries (plain or Parmesan), sweet potato fries, or chips',
     items: [
-      { name: 'Classic Club', price: '$13', note: 'Ham, turkey, bacon, lettuce, tomato, cheddar and swiss on toasted white bread' },
-      { name: 'Cheeseburger', price: '$15', note: 'Cheddar, bacon, lettuce, onion, tomato, & pickle' },
-      { name: 'Patty Melt', price: '$14', note: 'Grilled onions, pub sauce, swiss, american cheese, & mayo.' },
-      { name: 'Grilled Chicken', price: '$15', note: 'Toasted bun with chicken, lettuce, tomato, & onion' },
+      { name: 'Classic Club', note: 'Ham, turkey, bacon, lettuce, tomato, cheddar and swiss on toasted white bread' },
+      { name: 'Cheeseburger', note: 'Cheddar, bacon, lettuce, onion, tomato, & pickle' },
+      { name: 'Patty Melt', note: 'Grilled onions, pub sauce, swiss, american cheese, & mayo.' },
+      { name: 'Grilled Chicken', note: 'Toasted bun with chicken, lettuce, tomato, & onion' },
     ],
   },
   {
@@ -57,9 +57,9 @@ const defaultPanels: Panel[] = [
     title: 'Pastas',
     bannerNote: 'Served with garlic bread & choice of side House or Caesar salad',
     items: [
-      { name: 'Spaghetti', price: '$13', note: 'Marinara or meat sauce' },
-      { name: 'Fettuccine Alfredo', price: '$15', note: 'Creamy alfredo sauce with grilled chicken & noodles' },
-      { name: 'Mushroom Ravioli Portobello', price: '$17', note: 'Mushroom stuffed ravioli with alfredo sauce, sauteed tomatoes, & mushrooms' },
+      { name: 'Spaghetti', note: 'Marinara or meat sauce' },
+      { name: 'Fettuccine Alfredo', note: 'Creamy alfredo sauce with grilled chicken & noodles' },
+      { name: 'Mushroom Ravioli Portobello', note: 'Mushroom stuffed ravioli with alfredo sauce, sauteed tomatoes, & mushrooms' },
     ],
   },
   {
@@ -67,18 +67,18 @@ const defaultPanels: Panel[] = [
     title: 'Entrees',
     bannerNote: 'Served with House or Caesar salad, plus one extra side of your choice',
     items: [
-      { name: 'Blackened Salmon', price: '$22', note: 'Grilled black salmon' },
-      { name: 'Chicken Tenders', price: '$15', note: 'Choice of dipping sauces: Parmesan garlic, Honey spicy, hot, ranch, honey mustard, or pub sauce.' },
-      { name: 'Grilled Chicken Breast', price: '$17', note: 'Grilled chicken breast with seasonings' },
+      { name: 'Blackened Salmon', note: 'Grilled black salmon' },
+      { name: 'Chicken Tenders', note: 'Choice of dipping sauces: Parmesan garlic, Honey spicy, hot, ranch, honey mustard, or pub sauce.' },
+      { name: 'Grilled Chicken Breast', note: 'Grilled chicken breast with seasonings' },
     ],
   },
   {
     key: 'kids-meals',
     title: 'Kids Meals',
     items: [
-      { name: 'Kids Spaghetti', price: '$9', note: 'Marinara or meat sauce. Garlic bread.' },
-      { name: 'Kids Chicken Strips', price: '$9', note: 'Served with fries or chips' },
-      { name: 'Kids Quesadilla', price: '$9', note: 'Served with fries or chips' },
+      { name: 'Kids Spaghetti', note: 'Marinara or meat sauce. Garlic bread.' },
+      { name: 'Kids Chicken Strips', note: 'Served with fries or chips' },
+      { name: 'Kids Quesadilla', note: 'Served with fries or chips' },
     ],
   },
   {
@@ -93,9 +93,9 @@ const defaultPanels: Panel[] = [
     title: 'Pizza',
     bannerNote: 'Specialty 16" Thin Crust | Toppings $1.95 Each',
     items: [
-      { name: 'Deluxe', price: '$25', note: 'Pepperoni, sausage, onions, green peppers, mushrooms, & green olives.' },
-      { name: 'Meat Lovers', price: '$25', note: 'Pepperoni, sausage, beef, & canadian bacon.' },
-      { name: 'Build Your Own', price: '$20', note: 'Toppings Available: Beef, Black Olives, Canadian Bacon, Cheese, Extra Cheese, Extra Sauce, Garlic, Green Olives, Green Peppers, Mushrooms, Onions, Pepperoni, Red Onion, Sausage, & Tomato' },
+      { name: 'Deluxe', note: 'Pepperoni, sausage, onions, green peppers, mushrooms, & green olives.' },
+      { name: 'Meat Lovers', note: 'Pepperoni, sausage, beef, & canadian bacon.' },
+      { name: 'Build Your Own', note: 'Toppings Available: Beef, Black Olives, Canadian Bacon, Cheese, Extra Cheese, Extra Sauce, Garlic, Green Olives, Green Peppers, Mushrooms, Onions, Pepperoni, Red Onion, Sausage, & Tomato' },
     ],
   },
   {
@@ -111,10 +111,10 @@ const defaultPanels: Panel[] = [
     title: 'Signature Cocktails',
     bannerNote: 'From a classic Old Fashioned to custom twists — our bartenders craft your favorite drink',
     items: [
-      { name: 'New Beginnings', price: '$12', note: 'Bright passionfruit, crisp tequila, and a sparkling toast to what’s next' },
-      { name: 'Crème Brûlée Whiskey Sour', price: '$14', note: 'Silky whiskey sour finished with a crisp, caramelized sugar crust · Rich & creamy' },
-      { name: 'Hot Honey Old Fashioned', price: '$13', note: 'Featuring Southern Illinois’ Sons of Mitches Whiskey, house hot honey syrup & bitters · Sweet, hot, or extra hot' },
-      { name: 'Peach Tea Mule', price: '$11', note: 'Vodka, peach liqueur, house-brewed sweet tea & ginger beer · Southern Illinois staple' },
+      { name: 'New Beginnings', note: 'Bright passionfruit, crisp tequila, and a sparkling toast to what’s next' },
+      { name: 'Crème Brûlée Whiskey Sour', note: 'Silky whiskey sour finished with a crisp, caramelized sugar crust · Rich & creamy' },
+      { name: 'Hot Honey Old Fashioned', note: 'Featuring Southern Illinois’ Sons of Mitches Whiskey, house hot honey syrup & bitters · Sweet, hot, or extra hot' },
+      { name: 'Peach Tea Mule', note: 'Vodka, peach liqueur, house-brewed sweet tea & ginger beer · Southern Illinois staple' },
     ],
   },
 ]
