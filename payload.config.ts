@@ -1,7 +1,7 @@
 import { buildConfig } from 'payload'
 // Payload CMS Configuration - The Hidden Kitchen v2
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
-import { sqliteAdapter } from '@payloadcms/db-sqlite'
+import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -67,11 +67,10 @@ export default buildConfig({
       },
     },
   }),
-  db: sqliteAdapter({
-    client: {
-      url: process.env.DATABASE_URI || 'file:./payload.db',
+  db: postgresAdapter({
+    pool: {
+      connectionString: process.env.DATABASE_URL!,
     },
-    push: false,
   }),
   collections: [
     {
