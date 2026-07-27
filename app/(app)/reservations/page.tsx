@@ -129,8 +129,7 @@ export default function ReservationsPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.55 }}
             >
-              <div className="flex items-center gap-2.5 mb-5 sm:mb-6">
-                <CalendarDays className="h-4 w-4 sm:h-5 sm:w-5 text-gold" />
+              <div className="flex items-center mb-5 sm:mb-6">
                 <span className="text-xs font-sans font-bold uppercase tracking-[0.2em] text-gold">
                   Table Reservations
                 </span>

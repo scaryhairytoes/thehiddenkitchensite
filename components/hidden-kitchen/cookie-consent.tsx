@@ -56,15 +56,15 @@ export function CookieConsent() {
           role="region"
           aria-label="Cookie consent banner"
         >
-          <div className="relative overflow-hidden rounded-2xl border border-gold/30 bg-black/92 p-5 sm:p-6 shadow-[0_16px_50px_rgba(0,0,0,0.9)] backdrop-blur-2xl text-white font-sans space-y-4">
+          <div className="relative overflow-hidden rounded-none border border-gold/30 bg-black p-5 sm:p-6 shadow-[0_16px_50px_rgba(0,0,0,0.9)] text-white font-sans space-y-4">
             
             {/* Ambient gold glow background */}
-            <div className="pointer-events-none absolute -top-16 -right-16 h-36 w-36 rounded-full bg-gold/15 blur-2xl" />
+            {/* Removed glowing orb */}
 
             {/* Banner Header */}
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gold/40 bg-gold/10 text-gold shrink-0">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-none border border-gold/40 bg-black text-gold shrink-0">
                   <Cookie className="h-5 w-5" />
                 </span>
                 <div>
@@ -103,7 +103,7 @@ export function CookieConsent() {
               {/* Deny */}
               <button
                 onClick={() => handleConsent('deny')}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-white/15 bg-white/5 text-xs font-bold uppercase tracking-wider text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-none border border-white/15 bg-black text-xs font-bold uppercase tracking-wider text-white/70 hover:bg-white/10 hover:text-white transition-all duration-200"
               >
                 <Ban className="h-3.5 w-3.5 opacity-60" />
                 <span>Deny</span>
@@ -112,7 +112,7 @@ export function CookieConsent() {
               {/* Necessary Only */}
               <button
                 onClick={() => handleConsent('necessary')}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-gold/40 bg-gold/10 text-xs font-bold uppercase tracking-wider text-gold hover:bg-gold/20 hover:text-white transition-all duration-200"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-none border border-gold/40 bg-black text-xs font-bold uppercase tracking-wider text-gold hover:bg-[#111] hover:text-white transition-all duration-200"
               >
                 <CheckCircle2 className="h-3.5 w-3.5" />
                 <span>Necessary Only</span>
@@ -121,7 +121,7 @@ export function CookieConsent() {
               {/* Allow All */}
               <button
                 onClick={() => handleConsent('allow_all')}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-gold text-black text-xs font-bold uppercase tracking-wider hover:bg-gold/90 transition-all duration-200 shadow-md shadow-gold/20"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-none bg-gold text-black text-xs font-bold uppercase tracking-wider hover:bg-white transition-all duration-200"
               >
                 <ShieldCheck className="h-3.5 w-3.5" />
                 <span>Allow All</span>

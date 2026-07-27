@@ -3,21 +3,31 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
+let initialLoadDone = false
+
 export function Preloader() {
+  const [alreadyLoaded] = useState(() => initialLoadDone)
   const [done, setDone] = useState(false)
 
   useEffect(() => {
+    if (alreadyLoaded) return
+
     const original = document.body.style.overflow
     document.body.style.overflow = 'hidden'
 
     // Hold the gold screen for 2s, then dismiss
-    const timer = setTimeout(() => setDone(true), 2000)
+    const timer = setTimeout(() => {
+      initialLoadDone = true
+      setDone(true)
+    }, 2000)
 
     return () => {
       clearTimeout(timer)
       document.body.style.overflow = original
     }
-  }, [])
+  }, [alreadyLoaded])
+
+  if (alreadyLoaded) return null
 
   return (
     <AnimatePresence
@@ -29,7 +39,7 @@ export function Preloader() {
         <motion.div
           key="preloader"
           suppressHydrationWarning
-          className="fixed inset-0 z-[100] flex items-center justify-center overflow-hidden bg-gold"
+          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-gold"
           exit={{ y: '-100%' }}
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
         >

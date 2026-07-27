@@ -73,66 +73,71 @@ export function TonightOnStage() {
       initial={{ opacity: 0, y: 6 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      className="w-full flex flex-col gap-1 text-xs sm:text-sm py-0.5 select-none"
+      className="flex flex-row items-center whitespace-nowrap text-xs sm:text-sm py-0.5 select-none w-full !justify-center gap-2 sm:gap-4 md:gap-[2vw] !ml-0 px-2 sm:px-4 ![background:transparent] ![background-color:transparent] ![box-shadow:none]"
+      style={{ alignItems: 'center' }}
     >
-      {/* LINE 1: Status indicator + Full Performer Name */}
-      <div className="flex items-center gap-2 sm:gap-2.5 min-w-0 w-full overflow-hidden">
-        <div className="flex items-center gap-1.5 shrink-0 font-sans font-bold text-[10px] sm:text-xs uppercase tracking-[0.18em]">
-          <span className="relative flex h-2 w-2 shrink-0">
-            <span className={next.isLive ? 'absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75' : 'hidden'} />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-gold" />
-          </span>
-          <span className="font-bold text-gold shrink-0">{statusLabel}</span>
-        </div>
-
-        <span className="text-gold/40 shrink-0">·</span>
-
-        {next.show.socialUrl || next.show.facebookUrl ? (
-          <a
-            href={formatFacebookUrl(next.show.socialUrl || next.show.facebookUrl)}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-bold uppercase tracking-tight text-white hover:text-gold transition-colors text-xs sm:text-sm md:text-base leading-tight truncate flex items-center gap-1"
-            title={`Visit ${actName}'s page`}
-          >
-            <span>{actName}</span>
-            <span className="text-gold text-xs opacity-75">↗</span>
-          </a>
-        ) : (
-          <span className="font-bold uppercase tracking-tight text-white transition-colors text-xs sm:text-sm md:text-base leading-tight truncate">
-            {actName}
-          </span>
-        )}
+      {/* Status indicator */}
+      <div className="flex items-center gap-1.5 shrink-0 font-sans font-bold text-[10px] sm:text-xs uppercase tracking-[0.18em]">
+        <span className="relative flex h-2 w-2 shrink-0">
+          <span className={next.isLive ? 'absolute inline-flex h-full w-full animate-ping rounded-full bg-gold opacity-75' : 'hidden'} />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-gold" />
+        </span>
+        <span className="font-bold text-gold shrink-0">{statusLabel}</span>
       </div>
 
-      {/* LINE 2: Date & Time range + Countdown + RSVP */}
-      <div className="flex items-center justify-between gap-2.5 w-full border-t border-white/10 pt-1">
-        <div className="flex flex-wrap items-center gap-2 font-sans text-[10px] sm:text-xs text-white/90 min-w-0">
-          <span className="font-bold text-white uppercase tracking-wider shrink-0">
-            {next.show.day} · {timeRangeStr}
-          </span>
+      <span className="text-gold/40 shrink-0">·</span>
 
-          {!next.isLive && !isTBA && (
-            <>
-              <span className="text-gold/40 shrink-0">·</span>
-              <span className="uppercase tracking-wider text-[9px] sm:text-[10px] text-white/70 shrink-0 font-medium">Takes stage in</span>
-              <span className="font-bold text-gold tracking-wider text-xs shrink-0">{countdownStr}</span>
-            </>
-          )}
-        </div>
+      {/* Performer Name */}
+      {next.show.socialUrl || next.show.facebookUrl ? (
+        <a
+          href={formatFacebookUrl(next.show.socialUrl || next.show.facebookUrl)}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-bold uppercase tracking-tight text-white hover:text-gold transition-colors text-[10px] sm:text-sm md:text-base leading-tight whitespace-nowrap flex items-center shrink-0"
+          title={`Visit ${actName}'s page`}
+        >
+          <span>{actName}</span>
+          <span style={{ color: '#C6A573', paddingLeft: '4px', fontFamily: 'sans-serif' }}>&#8599;</span>
+        </a>
+      ) : (
+        <span className="font-bold uppercase tracking-tight text-white transition-colors text-[10px] sm:text-sm md:text-base leading-tight whitespace-nowrap shrink-0">
+          {actName}
+        </span>
+      )}
 
-        {next.show.facebookUrl && (
+      {/* Date & Time range (HIDDEN) */}
+      <span className="!hidden">·</span>
+      <span className="!hidden font-bold text-white font-sans text-[10px] sm:text-xs uppercase tracking-wider shrink-0">
+        {next.show.day} · {timeRangeStr}
+      </span>
+
+      {/* Countdown */}
+      {!next.isLive && !isTBA && (
+        <>
+          <span className="text-gold/40 shrink-0">·</span>
+          <div className="flex items-center gap-1.5 shrink-0 font-sans text-[9px] sm:text-[10px] uppercase tracking-wider">
+            <span className="text-white/70 font-medium hidden sm:inline">Takes stage in</span>
+            <span className="font-bold text-gold text-[10px] sm:text-xs">{countdownStr}</span>
+          </div>
+        </>
+      )}
+
+      {/* RSVP */}
+      {next.show.facebookUrl && (
+        <>
+          <span className="text-gold/40 shrink-0 !hidden">·</span>
           <a
             href={formatFacebookUrl(next.show.facebookUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 font-sans text-[9px] sm:text-[10px] font-bold uppercase tracking-widest text-gold hover:bg-gold hover:text-black transition-all duration-200 border border-gold/40 bg-gold/10 px-2.5 py-0.5 rounded shrink-0"
+            className="inline-flex items-center gap-1 font-sans text-[8px] sm:text-[10px] font-bold uppercase tracking-widest text-gold hover:bg-gold hover:text-black transition-all duration-200 border border-gold/40 bg-gold/10 px-2 py-0.5 sm:px-2.5 rounded shrink-0"
+            style={{ boxSizing: 'border-box' }}
           >
             <span>RSVP</span>
-            <ExternalLink className="h-2.5 w-2.5" />
+            <ExternalLink className="h-2 w-2 sm:h-2.5 sm:w-2.5" />
           </a>
-        )}
-      </div>
+        </>
+      )}
     </motion.div>
   )
 }

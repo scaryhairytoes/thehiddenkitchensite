@@ -268,10 +268,7 @@ export default function BookTheStagePage() {
               transition={{ duration: 0.55 }}
             >
               {/* Eyebrow */}
-              <div className="flex items-center gap-2.5 mb-5 sm:mb-6">
-                <span className="inline-flex items-center justify-center h-8 w-8 rounded-full border border-gold/30 bg-gold/10">
-                  <Mic className="h-3.5 w-3.5 text-gold" />
-                </span>
+              <div className="flex items-center mb-5 sm:mb-6">
                 <span className="text-[10px] sm:text-xs font-sans font-bold uppercase tracking-[0.25em] text-gold">
                   Perform or Host an Event
                 </span>
@@ -290,19 +287,6 @@ export default function BookTheStagePage() {
                 Musicians, comedians, and community event hosts fill out this form and our events team will be in touch.
               </p>
 
-              {/* Stats / trust signals */}
-              <div className="hidden lg:flex mt-10 xl:mt-14 gap-8 border-t border-gold/15 pt-8">
-                {[
-                  { label: 'Shows this season', value: '40+' },
-                  { label: 'Response time',      value: '2–3 days' },
-                  { label: 'No cover charge',    value: 'Always' },
-                ].map(({ label, value }) => (
-                  <div key={label}>
-                    <p className="text-lg font-black text-gold">{value}</p>
-                    <p className="text-[10px] font-sans uppercase tracking-[0.15em] text-white/70 mt-0.5">{label}</p>
-                  </div>
-                ))}
-              </div>
             </motion.div>
           </aside>
 

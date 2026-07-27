@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from 'framer-motion'
 import { Menu as MenuIcon, X, Phone, MapPin } from 'lucide-react'
+import { UpNext } from './up-next'
+import { usePathname } from 'next/navigation'
 
 const SECTIONS = [
   { id: 'story', label: 'The Story' },
@@ -20,7 +22,7 @@ export function EdgeNav() {
   useEffect(() => {
     const update = () => {
       const isMobile = window.innerWidth < 768
-      setLogoSize({ top: isMobile ? 32 : 40, size: isMobile ? 44 : 56 })
+      setLogoSize({ top: isMobile ? 32 : 36, size: isMobile ? 48 : 56 })
     }
     update()
     window.addEventListener('resize', update)
@@ -29,6 +31,20 @@ export function EdgeNav() {
 
   const { scrollY } = useScroll()
   const logoOpacity = useTransform(scrollY, [100, 300], [0, 1])
+
+  const [isSticky, setIsSticky] = useState(false)
+
+  useMotionValueEvent(scrollY, 'change', (latest) => {
+    if (typeof window !== 'undefined') {
+      // It docks at the top when we scroll exactly the height of the hero (100vh)
+      // Trigger slightly early to ensure it's glass when it hits the top
+      if (latest >= window.innerHeight - 20) {
+        setIsSticky(true)
+      } else {
+        setIsSticky(false)
+      }
+    }
+  })
 
   useEffect(() => {
     const handleScroll = () => {
@@ -93,16 +109,48 @@ export function EdgeNav() {
     }
   }
 
+  const pathname = usePathname()
+  if (pathname !== '/') return null
+
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[80] w-full h-16 md:h-20 bg-black transition-all duration-300">
-        <div
-          className="hidden md:grid w-full h-full items-center px-6 lg:px-10 xl:px-16"
-          style={{ gridTemplateColumns: '1fr 1fr clamp(240px, 25vw, 360px) 1fr 1fr' }}
-        >
+      <style>{`
+        @media (min-width: 768px) {
+          .desktop-links-container {
+            display: flex !important;
+            justify-content: space-evenly !important;
+          }
+          .mobile-hamburger-container {
+            display: none !important;
+          }
+        }
+        .master-header-gradient {
+          background: linear-gradient(to bottom, #000000 0%, #000000 55%, transparent 100%) !important;
+          border: none !important;
+        }
+        .master-header-glass {
+          background-color: rgba(20, 20, 20, 0.4) !important;
+          backdrop-filter: blur(10px) !important;
+          -webkit-backdrop-filter: blur(10px) !important;
+          border: none !important;
+        }
+        .inner-nav-row {
+          background: transparent !important;
+          border: none !important;
+          box-shadow: none !important;
+          padding: 12px 4vw !important;
+        }
+      `}</style>
+      <div 
+        className={`${isSticky ? 'master-header-glass' : 'master-header-gradient'} sticky top-0 z-[50] w-full transition-colors duration-300`}
+      >
+        <header className="inner-nav-row w-full transition-all duration-300">
+          <div
+            className="desktop-links-container hidden w-full items-center"
+          >
           <button
             onClick={() => go('story')}
-            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${active === 'story' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+            className={`flex items-center justify-center py-3 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ![background:transparent] ![background-color:transparent] ![box-shadow:none] ${active === 'story' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
               }`}
           >
             The Story
@@ -110,17 +158,17 @@ export function EdgeNav() {
 
           <button
             onClick={() => go('menu')}
-            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${active === 'menu' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+            className={`flex items-center justify-center py-3 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ![background:transparent] ![background-color:transparent] ![box-shadow:none] ${active === 'menu' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
               }`}
           >
             The Menu
           </button>
 
-          <div aria-hidden />
+          <div aria-hidden style={{ width: 'clamp(240px, 25vw, 360px)' }} />
 
           <button
             onClick={() => go('stage')}
-            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${active === 'stage' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+            className={`flex items-center justify-center py-3 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ![background:transparent] ![background-color:transparent] ![box-shadow:none] ${active === 'stage' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
               }`}
           >
             The Stage
@@ -128,14 +176,14 @@ export function EdgeNav() {
 
           <button
             onClick={() => go('visit')}
-            className={`flex items-center justify-center py-2 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ${active === 'visit' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
+            className={`flex items-center justify-center py-3 text-xs xl:text-sm font-semibold uppercase tracking-[0.3em] transition-colors duration-300 ![background:transparent] ![background-color:transparent] ![box-shadow:none] ${active === 'visit' ? 'text-gold' : 'text-foreground/40 hover:text-gold'
               }`}
           >
             The Details
           </button>
         </div>
 
-        <div className="flex md:hidden w-full h-full items-center justify-between px-6">
+        <div className="mobile-hamburger-container flex w-full items-center justify-between px-6">
           <div className="w-10" />
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -150,6 +198,8 @@ export function EdgeNav() {
           </button>
         </div>
       </header>
+      <UpNext />
+    </div>
 
       <AnimatePresence>
         {menuOpen && (
@@ -158,9 +208,30 @@ export function EdgeNav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25, ease: 'easeInOut' }}
-            className="fixed inset-0 z-[75] bg-black/95 backdrop-blur-lg flex flex-col items-center justify-center gap-8 md:hidden"
+            className="fixed inset-0 z-[75] bg-black/95 backdrop-blur-xl text-white flex flex-col items-center justify-center md:hidden"
           >
-            <div className="flex flex-col items-center gap-6">
+            {/* Close Button */}
+            <button
+              onClick={() => setMenuOpen(false)}
+              className="absolute top-6 right-6 p-2 text-white transition-transform hover:scale-110 hover:text-gold focus:outline-none"
+              aria-label="Close Menu"
+            >
+              <X className="h-8 w-8" strokeWidth={1.5} />
+            </button>
+
+            {/* Logo */}
+            <div className="mb-12">
+              <Image
+                src="/logo_only.svg"
+                alt="The Hidden Kitchen Symbol"
+                width={112}
+                height={112}
+                unoptimized
+                className="brightness-0 invert" 
+              />
+            </div>
+
+            <div className="flex flex-col items-center gap-5 w-full">
               {SECTIONS.map((s) => (
                 <button
                   key={s.id}
@@ -168,44 +239,33 @@ export function EdgeNav() {
                     go(s.id)
                     setMenuOpen(false)
                   }}
-                  className={`text-xl font-bold uppercase tracking-[0.35em] transition-colors duration-300 ${active === s.id ? 'text-gold' : 'text-foreground/60 hover:text-gold'
-                    }`}
+                  className="text-4xl sm:text-5xl font-black uppercase tracking-tight text-white hover:text-gold transition-colors duration-300 text-center w-full"
                 >
                   {s.label}
                 </button>
               ))}
             </div>
 
-            <div className="mt-2 flex items-center gap-5 text-[11px] font-semibold uppercase tracking-[0.25em]">
+            <div className="mt-12 flex items-center gap-5 text-xs font-bold uppercase tracking-[0.25em] text-white/70">
               <a
                 href="tel:+16186814208"
-                className="flex items-center gap-1.5 text-gold/70 transition-colors hover:text-gold"
+                className="flex items-center gap-2 hover:text-gold transition-colors"
               >
-                <Phone className="h-3.5 w-3.5" strokeWidth={1.75} /> Call
+                <Phone className="h-4 w-4" strokeWidth={2} /> Call
               </a>
-              <span className="h-3 w-px bg-gold/20" aria-hidden />
+              <span className="h-3 w-px bg-white/30" aria-hidden />
               <a
                 href="https://maps.google.com/?q=131+S+Division+St,+Carterville,+IL+62918"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1.5 text-gold/70 transition-colors hover:text-gold"
+                className="flex items-center gap-2 hover:text-gold transition-colors"
               >
-                <MapPin className="h-3.5 w-3.5" strokeWidth={1.75} /> Directions
+                <MapPin className="h-4 w-4" strokeWidth={2} /> Directions
               </a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-
-      <div className="pointer-events-none fixed bottom-4 left-4 z-[70] hidden items-center gap-2 md:flex md:left-6 md:bottom-6">
-        <motion.span
-          animate={{ opacity: [0.3, 1, 0.3] }}
-          transition={{ repeat: Infinity, duration: 2.5, ease: 'easeInOut' }}
-          className="text-[9px] font-semibold uppercase tracking-[0.35em] text-gold/70"
-        >
-          Scroll
-        </motion.span>
-      </div>
 
       <motion.button
         onClick={() => go('top')}
@@ -213,10 +273,10 @@ export function EdgeNav() {
           top: logoSize.top,
           width: logoSize.size,
           height: logoSize.size,
-          opacity: menuOpen ? 0 : logoOpacity,
+          opacity: menuOpen || active === 'menu' || active === 'stage' ? 0 : logoOpacity,
         }}
         suppressHydrationWarning
-        className={`fixed left-1/2 -translate-x-1/2 -translate-y-1/2 z-[90] flex items-center justify-center focus:outline-none transition-all duration-300 ${menuOpen ? 'pointer-events-none' : ''
+        className={`fixed left-1/2 -translate-x-1/2 -translate-y-1/2 z-[50] flex items-center justify-center focus:outline-none transition-all duration-300 ${menuOpen ? 'pointer-events-none' : ''
           }`}
         aria-label="The Hidden Kitchen Symbol — back to top"
       >

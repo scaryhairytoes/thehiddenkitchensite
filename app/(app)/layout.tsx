@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { SchemaMarkup } from '@/components/hidden-kitchen/schema-markup'
+import { Preloader } from '@/components/hidden-kitchen/preloader'
 import '../globals.css'
 
 export const metadata: Metadata = {
@@ -67,6 +68,7 @@ export default function RootLayout({
     <html lang="en" className="dark scroll-smooth" data-scroll-behavior="smooth">
       <body className="min-h-screen bg-black font-sans text-foreground antialiased selection:bg-gold selection:text-black">
         <SchemaMarkup />
+        <Preloader />
         {children}
       </body>
     </html>
