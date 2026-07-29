@@ -19,10 +19,10 @@ export function CookieConsent() {
     setMounted(true)
     const consent = localStorage.getItem(STORAGE_KEY)
     if (!consent) {
-      // If on main page, wait 3.2s for the preloader ("Glad you're here") to finish sliding off
-      // On subpages, pop up after a short 0.8s entrance delay
+      // Wait 3.0s on home page for preloader ("Glad you're here") to finish sliding off
+      // On subpages without preloader, pop up after 600ms entrance delay
       const isHomePage = pathname === '/'
-      const delay = isHomePage ? 3200 : 800
+      const delay = isHomePage ? 3000 : 600
 
       const timer = setTimeout(() => {
         setIsVisible(true)
@@ -52,7 +52,7 @@ export function CookieConsent() {
           animate={{ y: 0, opacity: 1, scale: 1 }}
           exit={{ y: 90, opacity: 0, scale: 0.95 }}
           transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed bottom-4 left-4 right-4 sm:left-6 sm:bottom-6 sm:right-auto sm:max-w-lg z-[90] pointer-events-auto"
+          className="fixed bottom-4 left-4 right-4 sm:left-6 sm:bottom-6 sm:right-auto sm:max-w-lg z-[9000] pointer-events-auto"
           role="region"
           aria-label="Cookie consent banner"
         >

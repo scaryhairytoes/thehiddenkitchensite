@@ -39,7 +39,7 @@ export function Preloader() {
         <motion.div
           key="preloader"
           suppressHydrationWarning
-          className="fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden bg-gold"
+          className="fixed inset-0 z-[99999] flex items-center justify-center overflow-hidden bg-gold"
           exit={{ y: '-100%' }}
           transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
         >
