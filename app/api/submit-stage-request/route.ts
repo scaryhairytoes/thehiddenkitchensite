@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('[stage-requests]', err)
+    console.error('[submit-stage-request]', err)
     return NextResponse.json(
       { error: 'Failed to process request. Please email us directly at events@thehiddenkitchen62.com.' },
       { status: 500 },

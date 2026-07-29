@@ -163,7 +163,7 @@ export default function BookTheStagePage() {
     }
 
     try {
-      const res = await fetch('/api/stage-requests', {
+      const res = await fetch('/api/submit-stage-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

@@ -270,7 +270,7 @@ export default buildConfig({
             if (operation !== 'create') return
 
             const {
-              position, name, email, phone, availability, message,
+              position, name, email, phone, availability, startDate, message,
               submissionMethod, resume, job1, job2, job3, education
             } = doc
 
@@ -322,6 +322,7 @@ export default buildConfig({
                   ${phone ? row('Phone', phone) : ''}
                   ${row('Position', position)}
                   ${row('Availability', availability)}
+                  ${startDate ? row('Available Start Date', startDate) : ''}
                   ${experienceHtml}
                   ${row('Message', message?.replace(/\n/g, '<br/>'))}
                 </table>
@@ -371,6 +372,11 @@ export default buildConfig({
           label: 'Availability',
           type: 'text',
           required: true,
+        },
+        {
+          name: 'startDate',
+          label: 'Available Start Date',
+          type: 'text',
         },
         {
           name: 'submissionMethod',
@@ -571,6 +577,23 @@ export default buildConfig({
           type: 'number',
           required: true,
           defaultValue: 17,
+        },
+        {
+          name: 'endHour',
+          label: 'End Hour 24h (e.g. 20 for 8:00 PM)',
+          type: 'number',
+          defaultValue: 20,
+          admin: {
+            description: 'End time in 24-hour format (e.g. 20 for 8:00 PM). If empty, defaults to 3 hours after start hour.',
+          },
+        },
+        {
+          name: 'timeStr',
+          label: 'Display Time String (e.g. 8:30 PM – 10:30 PM)',
+          type: 'text',
+          admin: {
+            description: 'Custom display time text shown on the website (e.g. 8:30 PM – 10:30 PM). Overrides numeric start/end hour formatting.',
+          },
         },
         {
           name: 'dateStr',

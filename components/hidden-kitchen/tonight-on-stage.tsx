@@ -2,24 +2,11 @@
 
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { getNextShow, useLineupData, formatFacebookUrl, type NextShow } from './lineup'
+import { getNextShow, useLineupData, formatFacebookUrl, formatShowTimeRange, type NextShow } from './lineup'
 import { ExternalLink } from 'lucide-react'
 
 function pad(n: number) {
   return String(Math.max(0, Math.floor(n))).padStart(2, '0')
-}
-
-function formatShowTimeRange(startHour?: number, durationHours = 3) {
-  if (startHour === undefined || startHour === null) return '7:00 PM – 10:00 PM'
-  const endHour = (startHour + durationHours) % 24
-
-  const formatH = (h: number) => {
-    const h12 = h % 12 === 0 ? 12 : h % 12
-    const ampm = h >= 12 ? 'PM' : 'AM'
-    return `${h12}:00 ${ampm}`
-  }
-
-  return `${formatH(startHour)} – ${formatH(endHour)}`
 }
 
 export function TonightOnStage() {
@@ -66,7 +53,7 @@ export function TonightOnStage() {
       ? 'TONIGHT ON STAGE'
       : `UP NEXT · ${next.show.day}`
 
-  const timeRangeStr = formatShowTimeRange(next.show.hour, 3)
+  const timeRangeStr = formatShowTimeRange(next.show.hour, next.show.endHour, next.show.timeStr)
 
   return (
     <motion.div

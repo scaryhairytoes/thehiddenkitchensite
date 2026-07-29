@@ -60,7 +60,7 @@ export default function ReservationsPage() {
     }
 
     try {
-      const res = await fetch('/api/reservations', {
+      const res = await fetch('/api/submit-reservation', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

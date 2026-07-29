@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('[reservations-api]', err)
+    console.error('[submit-reservation]', err)
     return NextResponse.json(
       { error: 'Failed to submit reservation. Please call us directly.' },
       { status: 500 },

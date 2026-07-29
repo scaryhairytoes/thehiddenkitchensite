@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRef, useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
-import { useLineupData, formatFacebookUrl, getGoogleCalendarUrl } from './lineup'
+import { useLineupData, formatFacebookUrl, getGoogleCalendarUrl, formatShowTimeRange } from './lineup'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 
 const MONTHS: { key: string; label: string }[] = [
@@ -94,7 +94,7 @@ export function Stage() {
         {/* Intro Paragraph */}
         <div className="w-full max-w-md lg:pt-12 !mb-[40px]">
           <p className="text-gray-300 text-base md:text-lg leading-relaxed font-sans m-0">
-            From live music and stand up comedy to trivia nights, The Stage is our spotlight for whatever is happening. No cover charge required and everyone is welcome. Step inside and take the break you deserve.
+            From live music and stand up comedy to trivia nights, The Stage is our spotlight for whatever is happening. Everyone is welcome. Step inside and take the break you deserve.
           </p>
         </div>
 
@@ -206,7 +206,7 @@ export function Stage() {
                             <div className="!text-[#FFFFFF] !font-medium text-[10px] md:text-xs font-sans uppercase tracking-widest !flex !flex-wrap !items-center !gap-[6px] !mt-[5px]">
                               <span className="text-[#C6A573] font-bold">{show.category || 'LIVE MUSIC'}</span>
                               <span className="w-1 h-1 rounded-full bg-white/30 hidden sm:block" />
-                              <span>{WEEKDAYS[show.weekday].toUpperCase()} 5-8PM</span>
+                              <span>{WEEKDAYS[show.weekday].toUpperCase()} {formatShowTimeRange(show.hour, show.endHour, show.timeStr)}</span>
                             </div>
                           </div>
 

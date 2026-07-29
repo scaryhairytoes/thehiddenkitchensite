@@ -74,7 +74,7 @@ export default function CareersPage() {
     }
 
     try {
-      const res = await fetch('/api/career-applications', {
+      const res = await fetch('/api/submit-career-application', {
         method: 'POST',
         body: formData,
       })
@@ -440,6 +440,21 @@ export default function CareersPage() {
                       </AnimatePresence>
                       {/* Hidden input for HTML validation to require selection */}
                       <input type="text" name="availability" required className="absolute opacity-0 w-0 h-0 pointer-events-none" value={employmentType} onChange={() => {}} tabIndex={-1} />
+                    </div>
+
+                    {/* Available Start Date */}
+                    <div>
+                      <label htmlFor="startDate" className={labelCls}>
+                        Available Start Date <span className="text-red-500/80">*</span>
+                      </label>
+                      <input
+                        id="startDate"
+                        name="startDate"
+                        type="text"
+                        required
+                        placeholder="e.g. Immediately, As soon as possible, or MM/DD/YYYY"
+                        className={inputCls}
+                      />
                     </div>
 
                     {/* Experience Section */}

@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
     const email = formData.get('email') as string
     const phone = formData.get('phone') as string
     const availability = formData.get('availability') as string
+    const startDate = (formData.get('startDate') as string) || undefined
     const message = formData.get('message') as string
     const submissionMethod = formData.get('submissionMethod') as string
     
@@ -60,6 +61,7 @@ export async function POST(req: NextRequest) {
         email,
         phone,
         availability,
+        startDate,
         message,
         submissionMethod,
         resume: resumeId,
@@ -72,7 +74,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error('[career-applications]', err)
+    console.error('[submit-career-application]', err)
     return NextResponse.json(
       { error: 'Failed to process application. Please email us directly.' },
       { status: 500 },

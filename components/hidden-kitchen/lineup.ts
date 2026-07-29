@@ -7,6 +7,8 @@ export type Show = {
   genre: string
   category?: string // 'Live Music' | 'Stand-Up Comedy' | 'Trivia Night' | 'Special Event'
   hour: number // 24h start time
+  endHour?: number // 24h end time
+  timeStr?: string // Custom display time e.g. "8:30 PM – 10:30 PM"
   dateStr?: string // YYYY-MM-DD
   monthKey?: string // 'JUL' | 'AUG' | 'SEP' | 'OCT' | 'NOV' | 'DEC'
   facebookUrl?: string
@@ -20,6 +22,8 @@ type CMSDoc = {
   genre?: string
   category?: string
   hour?: number
+  endHour?: number
+  timeStr?: string
   dateStr?: string
   monthKey?: string
   facebookUrl?: string
@@ -34,6 +38,32 @@ export function formatFacebookUrl(url?: string): string {
     trimmed = `https://${trimmed}`
   }
   return trimmed
+}
+
+export function formatShowTimeRange(startHour?: number, endHour?: number, customTimeStr?: string): string {
+  if (customTimeStr && customTimeStr.trim()) {
+    return customTimeStr.trim()
+  }
+
+  if (startHour === undefined || startHour === null) return '5-8PM'
+  const end = endHour !== undefined && endHour !== null ? endHour : (startHour + 3) % 24
+
+  const fmt = (h: number) => {
+    const hours = Math.floor(h)
+    const minutes = Math.round((h - hours) * 60)
+    const h12 = hours % 12 === 0 ? 12 : hours % 12
+    const ampm = hours >= 12 ? 'PM' : 'AM'
+    const minStr = minutes > 0 ? `:${String(minutes).padStart(2, '0')}` : ''
+    return { h12Str: `${h12}${minStr}`, ampm }
+  }
+
+  const s = fmt(startHour)
+  const e = fmt(end)
+
+  if (s.ampm === e.ampm) {
+    return `${s.h12Str}-${e.h12Str}${e.ampm}`
+  }
+  return `${s.h12Str}${s.ampm}-${e.h12Str}${e.ampm}`
 }
 
 function getMonthKey(dayStr: string): string {
@@ -75,6 +105,8 @@ export function useLineupData() {
             genre: doc.genre || 'Live Music',
             category: doc.category || 'Live Music',
             hour: typeof doc.hour === 'number' ? doc.hour : 17,
+            endHour: typeof doc.endHour === 'number' ? doc.endHour : 20,
+            timeStr: doc.timeStr || undefined,
             dateStr: doc.dateStr || undefined,
             monthKey: doc.monthKey || getMonthKey(doc.day || ''),
             facebookUrl: doc.facebookUrl ? formatFacebookUrl(doc.facebookUrl) : undefined,
@@ -95,21 +127,21 @@ export function useLineupData() {
 
 // Single source of truth for fallback schedule.
 export const lineup: Show[] = [
-  { dateStr: '2026-07-22', day: 'Jul 22', weekday: 3, act: 'Christopher John Davis Chamness', genre: 'Acoustic & Vocals', category: 'Live Music', hour: 17, monthKey: 'JUL', facebookUrl: 'https://facebook.com/events' },
-  { dateStr: '2026-07-29', day: 'Jul 29', weekday: 3, act: 'Taylor Kearney', genre: 'Live Performance', category: 'Live Music', hour: 17, monthKey: 'JUL', facebookUrl: 'https://facebook.com/events' },
-  { dateStr: '2026-08-05', day: 'Aug 5', weekday: 3, act: 'Jermaine Bollinger', genre: 'Live Music', category: 'Live Music', hour: 17, monthKey: 'AUG' },
-  { dateStr: '2026-08-12', day: 'Aug 12', weekday: 3, act: 'Tim Crosby', genre: 'Singer-Songwriter', category: 'Live Music', hour: 17, monthKey: 'AUG' },
-  { dateStr: '2026-08-26', day: 'Aug 26', weekday: 3, act: 'Max Dalton', genre: 'Live Performance', category: 'Live Music', hour: 17, monthKey: 'AUG' },
-  { dateStr: '2026-09-09', day: 'Sep 9', weekday: 3, act: 'Saint City 2', genre: 'Live Performance', category: 'Live Music', hour: 17, monthKey: 'SEP' },
-  { dateStr: '2026-09-16', day: 'Sep 16', weekday: 3, act: 'Isaiah Cunningham', genre: 'Acoustic Set', category: 'Live Music', hour: 17, monthKey: 'SEP' },
-  { dateStr: '2026-09-23', day: 'Sep 23', weekday: 3, act: 'Edwin Linson', genre: 'Live Performance', category: 'Live Music', hour: 17, monthKey: 'SEP' },
-  { dateStr: '2026-09-30', day: 'Sep 30', weekday: 3, act: 'Jonny Coller', genre: 'Live Music', category: 'Live Music', hour: 17, monthKey: 'SEP' },
-  { dateStr: '2026-10-07', day: 'Oct 7', weekday: 3, act: 'Max Dalton', genre: 'Live Performance', category: 'Live Music', hour: 17, monthKey: 'OCT' },
-  { dateStr: '2026-10-14', day: 'Oct 14', weekday: 3, act: 'Christopher John Davis Chamness', genre: 'Acoustic & Vocals', category: 'Live Music', hour: 17, monthKey: 'OCT' },
-  { dateStr: '2026-10-21', day: 'Oct 21', weekday: 3, act: 'Matt Basler', genre: 'Live Music', category: 'Live Music', hour: 17, monthKey: 'OCT' },
-  { dateStr: '2026-10-28', day: 'Oct 28', weekday: 3, act: 'Logan Allen Chapman', genre: 'Live Performance', category: 'Live Music', hour: 17, monthKey: 'OCT' },
-  { dateStr: '2026-11-04', day: 'Nov 4', weekday: 3, act: 'Isaiah Cunningham', genre: 'Live Music', category: 'Live Music', hour: 17, monthKey: 'NOV' },
-  { dateStr: '2026-12-02', day: 'Dec 2', weekday: 3, act: 'Jermaine Bollinger', genre: 'Live Music', category: 'Live Music', hour: 17, monthKey: 'DEC' },
+  { dateStr: '2026-07-22', day: 'Jul 22', weekday: 3, act: 'Christopher John Davis Chamness', genre: 'Acoustic & Vocals', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'JUL', facebookUrl: 'https://facebook.com/events' },
+  { dateStr: '2026-07-29', day: 'Jul 29', weekday: 3, act: 'Taylor Kearney', genre: 'Live Performance', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'JUL', facebookUrl: 'https://facebook.com/events' },
+  { dateStr: '2026-08-05', day: 'Aug 5', weekday: 3, act: 'Jermaine Bollinger', genre: 'Live Music', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'AUG' },
+  { dateStr: '2026-08-12', day: 'Aug 12', weekday: 3, act: 'Tim Crosby', genre: 'Singer-Songwriter', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'AUG' },
+  { dateStr: '2026-08-26', day: 'Aug 26', weekday: 3, act: 'Max Dalton', genre: 'Live Performance', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'AUG' },
+  { dateStr: '2026-09-09', day: 'Sep 9', weekday: 3, act: 'Saint City 2', genre: 'Live Performance', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'SEP' },
+  { dateStr: '2026-09-16', day: 'Sep 16', weekday: 3, act: 'Isaiah Cunningham', genre: 'Acoustic Set', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'SEP' },
+  { dateStr: '2026-09-23', day: 'Sep 23', weekday: 3, act: 'Edwin Linson', genre: 'Live Performance', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'SEP' },
+  { dateStr: '2026-09-30', day: 'Sep 30', weekday: 3, act: 'Jonny Coller', genre: 'Live Music', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'SEP' },
+  { dateStr: '2026-10-07', day: 'Oct 7', weekday: 3, act: 'Max Dalton', genre: 'Live Performance', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'OCT' },
+  { dateStr: '2026-10-14', day: 'Oct 14', weekday: 3, act: 'Christopher John Davis Chamness', genre: 'Acoustic & Vocals', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'OCT' },
+  { dateStr: '2026-10-21', day: 'Oct 21', weekday: 3, act: 'Matt Basler', genre: 'Live Music', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'OCT' },
+  { dateStr: '2026-10-28', day: 'Oct 28', weekday: 3, act: 'Logan Allen Chapman', genre: 'Live Performance', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'OCT' },
+  { dateStr: '2026-11-04', day: 'Nov 4', weekday: 3, act: 'Isaiah Cunningham', genre: 'Live Music', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'NOV' },
+  { dateStr: '2026-12-02', day: 'Dec 2', weekday: 3, act: 'Jermaine Bollinger', genre: 'Live Music', category: 'Live Music', hour: 17, endHour: 20, monthKey: 'DEC' },
 ]
 
 export type NextShow = {
@@ -129,7 +161,9 @@ export function getNextShow(now: Date, customLineup: Show[] = lineup): NextShow 
 
       if (show.dateStr) {
         const [year, month, day] = show.dateStr.split('-').map(Number)
-        start = new Date(year, month - 1, day, show.hour, 0, 0, 0)
+        const startH = Math.floor(show.hour)
+        const startM = Math.round((show.hour - startH) * 60)
+        start = new Date(year, month - 1, day, startH, startM, 0, 0)
       } else {
         // Fallback parsing for day strings like "Jul 29"
         const currentYear = now.getFullYear()
@@ -141,8 +175,12 @@ export function getNextShow(now: Date, customLineup: Show[] = lineup): NextShow 
 
       if (!start) return null
 
+      const durationHours = (show.endHour !== undefined && show.endHour > show.hour)
+        ? (show.endHour - show.hour)
+        : 3
+
       const end = new Date(start)
-      end.setHours(start.getHours() + 3, 0, 0, 0) // 3-hour set
+      end.setMinutes(start.getMinutes() + Math.round(durationHours * 60))
 
       return { show, start, end }
     })
@@ -168,22 +206,31 @@ export function getNextShow(now: Date, customLineup: Show[] = lineup): NextShow 
   // Fallback if all dates are in the past: return first element in original lineup
   const show = currentLineup[0]
   const target = new Date(now)
-  target.setHours(show.hour, 0, 0, 0)
+  target.setHours(Math.floor(show.hour), Math.round((show.hour - Math.floor(show.hour)) * 60), 0, 0)
   return { show, target, isTonight: false, isLive: false }
 }
 
 export function getGoogleCalendarUrl(show: Show): string {
   if (!show.dateStr) return '#'
   const [year, month, day] = show.dateStr.split('-')
-  const startHour = String(show.hour).padStart(2, '0')
-  const endHour = String(show.hour + 3).padStart(2, '0')
+  
+  const startH = Math.floor(show.hour)
+  const startM = Math.round((show.hour - startH) * 60)
+  const startHourStr = String(startH).padStart(2, '0')
+  const startMinStr = String(startM).padStart(2, '0')
+
+  const calculatedEnd = show.endHour !== undefined ? show.endHour : show.hour + 3
+  const endH = Math.floor(calculatedEnd)
+  const endM = Math.round((calculatedEnd - endH) * 60)
+  const endHourStr = String(endH).padStart(2, '0')
+  const endMinStr = String(endM).padStart(2, '0')
 
   const title = encodeURIComponent(`${show.act} — Live at The Hidden Kitchen`)
   const details = encodeURIComponent(
     `Join us for ${show.act} on The Stage at The Hidden Kitchen!\nLocation: 131 S Division St, Carterville, IL 62918`
   )
   const location = encodeURIComponent('The Hidden Kitchen, 131 S Division St, Carterville, IL 62918')
-  const dates = `${year}${month}${day}T${startHour}0000Z/${year}${month}${day}T${endHour}0000Z`
+  const dates = `${year}${month}${day}T${startHourStr}${startMinStr}00Z/${year}${month}${day}T${endHourStr}${endMinStr}00Z`
 
   return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&details=${details}&location=${location}&dates=${dates}`
 }
