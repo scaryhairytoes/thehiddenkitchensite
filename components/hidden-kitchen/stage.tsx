@@ -7,6 +7,12 @@ import { useLineupData, formatFacebookUrl, getGoogleCalendarUrl, formatShowTimeR
 import { ArrowRight, ChevronDown } from 'lucide-react'
 
 const MONTHS: { key: string; label: string }[] = [
+  { key: 'JAN', label: 'January' },
+  { key: 'FEB', label: 'February' },
+  { key: 'MAR', label: 'March' },
+  { key: 'APR', label: 'April' },
+  { key: 'MAY', label: 'May' },
+  { key: 'JUN', label: 'June' },
   { key: 'JUL', label: 'July' },
   { key: 'AUG', label: 'August' },
   { key: 'SEP', label: 'September' },
@@ -19,10 +25,41 @@ const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Frida
 
 export function Stage() {
   const ref = useRef<HTMLElement>(null)
-  const [activeMonth, setActiveMonth] = useState<string>('JUL')
+  const [activeMonth, setActiveMonth] = useState<string>(() => {
+    const curIdx = new Date().getMonth()
+    return MONTHS[curIdx]?.key || 'AUG'
+  })
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
 
   const lineupData = useLineupData()
+
+  // Auto-switch active month on mount/lineup load based on current date
+  useEffect(() => {
+    const today = new Date()
+    const currentMonthKey = MONTHS[today.getMonth()]?.key
+    const todayStr = today.toISOString().split('T')[0]
+
+    // Check if there are upcoming shows in the current month
+    const hasCurrentMonthShows = lineupData.some((show) => {
+      if (!show.dateStr) return false
+      return show.dateStr >= todayStr && show.monthKey === currentMonthKey
+    })
+
+    if (hasCurrentMonthShows && currentMonthKey) {
+      setActiveMonth(currentMonthKey)
+    } else {
+      // Find the first upcoming show month if current month has no upcoming shows
+      const upcomingShows = lineupData
+        .filter((show) => show.dateStr && show.dateStr >= todayStr)
+        .sort((a, b) => (a.dateStr! > b.dateStr! ? 1 : -1))
+
+      if (upcomingShows.length > 0 && upcomingShows[0].monthKey) {
+        setActiveMonth(upcomingShows[0].monthKey)
+      } else if (currentMonthKey) {
+        setActiveMonth(currentMonthKey)
+      }
+    }
+  }, [lineupData])
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -50,7 +87,7 @@ export function Stage() {
   }, [lineupData])
 
   const filteredLineup = futureLineup.filter((show) => show.monthKey === activeMonth)
-  const activeMonthLabel = MONTHS.find(m => m.key === activeMonth)?.label.toUpperCase() || 'JULY'
+  const activeMonthLabel = MONTHS.find((m) => m.key === activeMonth)?.label.toUpperCase() || 'AUGUST'
 
   return (
     <section

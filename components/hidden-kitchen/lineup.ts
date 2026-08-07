@@ -68,13 +68,21 @@ export function formatShowTimeRange(startHour?: number, endHour?: number, custom
 
 function getMonthKey(dayStr: string): string {
   const upper = dayStr.toUpperCase()
+  if (upper.includes('JAN')) return 'JAN'
+  if (upper.includes('FEB')) return 'FEB'
+  if (upper.includes('MAR')) return 'MAR'
+  if (upper.includes('APR')) return 'APR'
+  if (upper.includes('MAY')) return 'MAY'
+  if (upper.includes('JUN')) return 'JUN'
   if (upper.includes('JUL')) return 'JUL'
   if (upper.includes('AUG')) return 'AUG'
   if (upper.includes('SEP')) return 'SEP'
   if (upper.includes('OCT')) return 'OCT'
   if (upper.includes('NOV')) return 'NOV'
   if (upper.includes('DEC')) return 'DEC'
-  return 'JUL'
+  const currentMonthIdx = new Date().getMonth()
+  const monthKeys = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+  return monthKeys[currentMonthIdx]
 }
 
 export function useLineupData() {
