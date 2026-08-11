@@ -24,7 +24,7 @@ const TIME_SLOTS = [
   '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
   '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
   '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM',
-  '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM', 
+  '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM',
   '7:00 PM', '7:30 PM', '8:00 PM'
 ]
 
@@ -32,7 +32,7 @@ export default function ReservationsPage() {
   const [partySize, setPartySize] = useState<number | ''>('')
   const [selectedTime, setSelectedTime] = useState<string>('')
   const [turnstileToken, setTurnstileToken] = useState('')
-  
+
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -143,7 +143,7 @@ export default function ReservationsPage() {
               <p className="text-sm sm:text-base text-white/90 leading-relaxed font-sans max-w-[400px]">
                 Join us for great food, craft cocktails, and live events. Select your preferred date, time, and party size below to secure a table with us.
               </p>
-              
+
               <div className="mt-8 space-y-4">
                 <div className="p-4 rounded-xl border border-gold/20 bg-gold/5">
                   <h3 className="text-xs font-bold uppercase tracking-widest text-gold mb-1 font-sans">Important Details</h3>
@@ -158,7 +158,7 @@ export default function ReservationsPage() {
           {/* ── RIGHT PANEL — Form ── */}
           <main className="flex-1 px-5 sm:px-8 lg:px-12 xl:px-24 py-10 sm:py-14 lg:py-20 flex flex-col justify-center">
             <div className="max-w-[640px] w-full mx-auto lg:mx-0">
-              
+
               <AnimatePresence mode="wait">
                 {status === 'success' ? (
                   <motion.div
@@ -194,7 +194,7 @@ export default function ReservationsPage() {
                     onSubmit={handleSubmit}
                     className="space-y-8"
                   >
-                    
+
                     {/* 1. Date & Party Size */}
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -245,11 +245,10 @@ export default function ReservationsPage() {
                             key={time}
                             type="button"
                             onClick={() => setSelectedTime(time)}
-                            className={`px-3 py-2.5 rounded-lg border text-xs sm:text-sm font-sans font-semibold transition-all duration-200 ${
-                              selectedTime === time
+                            className={`px-3 py-2.5 rounded-lg border text-xs sm:text-sm font-sans font-semibold transition-all duration-200 ${selectedTime === time
                                 ? 'border-gold bg-gold/20 text-gold'
                                 : 'border-white/10 bg-white/[0.02] text-white/70 hover:border-gold/40 hover:text-white'
-                            }`}
+                              }`}
                           >
                             {time}
                           </button>
@@ -310,7 +309,7 @@ export default function ReservationsPage() {
 
                     {/* Turnstile */}
                     <div>
-                      <Turnstile 
+                      <Turnstile
                         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                         onSuccess={(token) => setTurnstileToken(token)}
                       />
@@ -345,7 +344,7 @@ export default function ReservationsPage() {
           </main>
 
         </div>
-        
+
         {/* Global Footer */}
         <Footer />
       </div>

@@ -185,7 +185,7 @@ export default buildConfig({
 
             try {
               await req.payload.sendEmail({
-                to: 'events@thehiddenkitchen62.com',
+                to: ['events@thehiddenkitchen62.com', 'thehiddenkitchen26@gmail.com'],
                 replyTo: email.replace(/[\r\n]/g, ''),
                 subject: `[New ${categoryLabel} Booking] ${name}`.replace(/[\r\n]/g, ''),
                 html,
@@ -275,112 +275,9 @@ export default buildConfig({
     // ── Career Applications ──────────────────────────────────────────────────
     {
       slug: 'career-applications',
-      labels: {
-        singular: 'Career Application',
-        plural: 'Career Applications',
-      },
       access: {
-        create: () => false,
-      },
-      admin: {
-        useAsTitle: 'name',
-        defaultColumns: ['name', 'position', 'email', 'createdAt'],
-        group: 'HR',
-      },
-      hooks: {
-        afterChange: [
-          async ({ doc, operation, req }) => {
-            if (operation !== 'create') return
-
-            const position = escapeHtml(doc.position)
-            const name = escapeHtml(doc.name)
-            const email = escapeHtml(doc.email)
-            const phone = escapeHtml(doc.phone)
-            const availability = escapeHtml(doc.availability)
-            const startDate = escapeHtml(doc.startDate)
-            const message = escapeHtml(doc.message)
-            const education = escapeHtml(doc.education)
-            const submissionMethod = escapeHtml(doc.submissionMethod)
-            const resume = doc.resume
-            const job1 = doc.job1
-            const job2 = doc.job2
-            const job3 = doc.job3
-
-            const row = (label: string, value: string | undefined) =>
-              value
-                ? `<tr>
-                    <td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#D6AF00;width:160px;vertical-align:top;">${label}</td>
-                    <td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:14px;color:#ffffff;vertical-align:top;line-height:1.5;">${value}</td>
-                  </tr>`
-                : ''
-
-            let experienceHtml = ''
-            if (submissionMethod === 'resume' && resume) {
-              const fileUrl = `${process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'}${resume.url}`
-              experienceHtml = row('Resume', `<a href="${validateUrl(fileUrl)}" style="color:#D6AF00;">Download / View Resume</a>`)
-            } else if (submissionMethod === 'manual') {
-              type JobType = { company?: string; title?: string; dates?: string; responsibilities?: string }
-              const formatJob = (job: JobType | undefined, index: number) => {
-                if (!job || !job.company) return ''
-                const company = escapeHtml(job.company)
-                const title = escapeHtml(job.title)
-                const dates = escapeHtml(job.dates)
-                const responsibilities = escapeHtml(job.responsibilities)
-                return `
-                  <tr>
-                    <td colspan="2" style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:14px;color:#ffffff;line-height:1.5;">
-                      <strong style="color:#D6AF00;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;">Job ${index}</strong><br/>
-                      <strong>${company}</strong> — ${title} (${dates})<br/>
-                      <div style="margin-top:4px;color:rgba(255,255,255,0.7);">${responsibilities.replace(/\n/g, '<br/>') || ''}</div>
-                    </td>
-                  </tr>
-                `
-              }
-              experienceHtml = `
-                ${formatJob(job1, 1)}
-                ${formatJob(job2, 2)}
-                ${formatJob(job3, 3)}
-                ${education ? row('Education', education.replace(/\n/g, '<br/>')) : ''}
-              `
-            }
-
-            const html = `
-              <div style="font-family:'Georgia',serif;max-width:620px;margin:0 auto;background:#0a0a0a;color:#e8d8a0;padding:40px;border:1px solid rgba(214,175,0,0.3);border-radius:12px;">
-                <div style="text-align:center;margin-bottom:32px;">
-                  <p style="font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#D6AF00;margin:0 0 8px;">The Hidden Kitchen</p>
-                  <h1 style="font-size:26px;font-weight:900;text-transform:uppercase;margin:0;color:#ffffff;letter-spacing:-0.02em;">New Career Application</h1>
-                  <p style="margin:10px 0 0;font-size:13px;color:#D6AF00;letter-spacing:0.05em;">${position}</p>
-                </div>
-
-                <table style="width:100%;border-collapse:collapse;">
-                  ${row('Name', name)}
-                  ${row('Email', `<a href="mailto:${email}" style="color:#D6AF00;">${email}</a>`)}
-                  ${phone ? row('Phone', phone) : ''}
-                  ${row('Position', position)}
-                  ${row('Availability', availability)}
-                  ${startDate ? row('Available Start Date', startDate) : ''}
-                  ${experienceHtml}
-                  ${row('Message', message?.replace(/\n/g, '<br/>'))}
-                </table>
-
-                <p style="margin-top:36px;font-size:10px;color:rgba(214,175,0,0.45);text-align:center;letter-spacing:0.2em;text-transform:uppercase;">
-                  Submitted via thehiddenkitchen62.com
-                </p>
-              </div>
-            `
-
-            try {
-              await req.payload.sendEmail({
-                to: 'careers@thehiddenkitchen62.com',
-                replyTo: email.replace(/[\r\n]/g, ''),
-                subject: `[New Career App: ${position}] ${name}`.replace(/[\r\n]/g, ''),
-                html,
-              })
-            } catch (err) {
-              console.error('[career-applications] afterChange email error:', err)
-            }
-          },
-        ],
+        create: () => true,
+        read: ({ req: { user } }) => Boolean(user),
       },
       fields: [
         {
@@ -529,7 +426,7 @@ export default buildConfig({
 
             try {
               await req.payload.sendEmail({
-                to: 'reservations@thehiddenkitchen62.com',
+                to: ['reservations@thehiddenkitchen62.com', 'thehiddenkitchen26@gmail.com'],
                 replyTo: email.replace(/[\r\n]/g, ''),
                 subject: `[Reservation Request] ${date} - ${name} (${partySize} guests)`.replace(/[\r\n]/g, ''),
                 html,

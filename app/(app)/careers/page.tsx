@@ -28,9 +28,9 @@ const POSITIONS: {
   icon: React.ElementType
   roles?: string[]
 }[] = [
-  { value: 'Front of House', label: 'Front of House',  icon: Coffee,       roles: ['Servers', 'Bartenders', 'Hosts'] },
-  { value: 'Back of House',  label: 'Back of House',   icon: ChefHat,      roles: ['Line Cooks', 'Prep Cooks', 'Dishwashers'] },
-]
+    { value: 'Front of House', label: 'Front of House', icon: Coffee, roles: ['Servers', 'Bartenders', 'Hosts'] },
+    { value: 'Back of House', label: 'Back of House', icon: ChefHat, roles: ['Line Cooks', 'Prep Cooks', 'Dishwashers'] },
+  ]
 
 const EMPLOYMENT_TYPES = ['Full Time', 'Part Time', 'Temporary']
 const SHIFT_OPTIONS = ['Days', 'Nights', 'Weekends', 'Flexible']
@@ -253,16 +253,14 @@ export default function CareersPage() {
                                 type="button"
                                 id={`position-${value.replace(/[^a-zA-Z]/g, '').toLowerCase()}`}
                                 onClick={() => handlePositionSelect(value)}
-                                className={`w-full group relative text-left rounded-xl border p-3.5 sm:p-4 transition-all duration-200 ${
-                                  active
+                                className={`w-full group relative text-left rounded-xl border p-3.5 sm:p-4 transition-all duration-200 ${active
                                     ? 'border-gold/60 bg-gold/10'
                                     : 'border-white/10 bg-white/[0.03] hover:border-gold/30 hover:bg-gold/5'
-                                }`}
+                                  }`}
                               >
                                 <div className="flex items-start gap-2.5 sm:gap-3">
-                                  <span className={`mt-0.5 flex-shrink-0 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center border transition-colors ${
-                                    active ? 'border-gold/50 bg-gold/20' : 'border-white/10 bg-white/5'
-                                  }`}>
+                                  <span className={`mt-0.5 flex-shrink-0 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center border transition-colors ${active ? 'border-gold/50 bg-gold/20' : 'border-white/10 bg-white/5'
+                                    }`}>
                                     <Icon className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-colors ${active ? 'text-gold' : 'text-white/60'}`} />
                                   </span>
                                   <div className="min-w-0 self-center">
@@ -278,7 +276,7 @@ export default function CareersPage() {
                                   />
                                 )}
                               </button>
-                              
+
                               <AnimatePresence>
                                 {active && roles && (
                                   <motion.div
@@ -317,16 +315,14 @@ export default function CareersPage() {
                             type="button"
                             id="position-any"
                             onClick={() => handlePositionSelect('Any')}
-                            className={`w-full group relative text-left rounded-xl border p-3.5 sm:p-4 transition-all duration-200 ${
-                              selectedPosition === 'Any'
+                            className={`w-full group relative text-left rounded-xl border p-3.5 sm:p-4 transition-all duration-200 ${selectedPosition === 'Any'
                                 ? 'border-gold/60 bg-gold/10'
                                 : 'border-white/10 bg-white/[0.03] hover:border-gold/30 hover:bg-gold/5'
-                            }`}
+                              }`}
                           >
                             <div className="flex items-start gap-2.5 sm:gap-3">
-                              <span className={`mt-0.5 flex-shrink-0 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center border transition-colors ${
-                                selectedPosition === 'Any' ? 'border-gold/50 bg-gold/20' : 'border-white/10 bg-white/5'
-                              }`}>
+                              <span className={`mt-0.5 flex-shrink-0 h-6 w-6 sm:h-7 sm:w-7 rounded-lg flex items-center justify-center border transition-colors ${selectedPosition === 'Any' ? 'border-gold/50 bg-gold/20' : 'border-white/10 bg-white/5'
+                                }`}>
                                 <Briefcase className={`h-3 w-3 sm:h-3.5 sm:w-3.5 transition-colors ${selectedPosition === 'Any' ? 'text-gold' : 'text-white/60'}`} />
                               </span>
                               <div className="min-w-0 self-center">
@@ -399,18 +395,17 @@ export default function CareersPage() {
                                 setEmploymentType(type)
                                 if (status === 'error') { setStatus('idle'); setErrorMsg('') }
                               }}
-                              className={`text-center rounded-xl border p-3 transition-all duration-200 ${
-                                active
+                              className={`text-center rounded-xl border p-3 transition-all duration-200 ${active
                                   ? 'border-gold/60 bg-gold/10 text-white font-bold'
                                   : 'border-white/10 bg-white/[0.03] text-white/80 hover:border-gold/30 hover:bg-gold/5 hover:text-white'
-                              }`}
+                                }`}
                             >
                               <span className="text-xs sm:text-sm font-bold font-sans">{type}</span>
                             </button>
                           )
                         })}
                       </div>
-                      
+
                       <AnimatePresence>
                         {employmentType && (
                           <motion.div
@@ -441,7 +436,7 @@ export default function CareersPage() {
                         )}
                       </AnimatePresence>
                       {/* Hidden input for HTML validation to require selection */}
-                      <input type="text" name="availability" required className="absolute opacity-0 w-0 h-0 pointer-events-none" value={employmentType} onChange={() => {}} tabIndex={-1} />
+                      <input type="text" name="availability" required className="absolute opacity-0 w-0 h-0 pointer-events-none" value={employmentType} onChange={() => { }} tabIndex={-1} />
                     </div>
 
                     {/* Available Start Date */}
@@ -471,11 +466,10 @@ export default function CareersPage() {
                             setSubmissionMethod('resume')
                             if (status === 'error') { setStatus('idle'); setErrorMsg('') }
                           }}
-                          className={`flex items-center justify-center gap-2 rounded-xl border p-3.5 transition-all duration-200 ${
-                            submissionMethod === 'resume'
+                          className={`flex items-center justify-center gap-2 rounded-xl border p-3.5 transition-all duration-200 ${submissionMethod === 'resume'
                               ? 'border-gold/60 bg-gold/10 text-white font-bold'
                               : 'border-white/10 bg-white/[0.03] text-white/80 hover:border-gold/30 hover:bg-gold/5 hover:text-white'
-                          }`}
+                            }`}
                         >
                           <FileUp className="h-4 w-4 text-gold" />
                           <span className="text-xs sm:text-sm font-bold font-sans">Upload Resume</span>
@@ -486,19 +480,18 @@ export default function CareersPage() {
                             setSubmissionMethod('manual')
                             if (status === 'error') { setStatus('idle'); setErrorMsg('') }
                           }}
-                          className={`flex items-center justify-center gap-2 rounded-xl border p-3.5 transition-all duration-200 ${
-                            submissionMethod === 'manual'
+                          className={`flex items-center justify-center gap-2 rounded-xl border p-3.5 transition-all duration-200 ${submissionMethod === 'manual'
                               ? 'border-gold/60 bg-gold/10 text-white font-bold'
                               : 'border-white/10 bg-white/[0.03] text-white/80 hover:border-gold/30 hover:bg-gold/5 hover:text-white'
-                          }`}
+                            }`}
                         >
                           <FileText className="h-4 w-4 text-gold" />
                           <span className="text-xs sm:text-sm font-bold font-sans">Fill Manually</span>
                         </button>
                       </div>
-                      
+
                       {/* Hidden input for HTML validation to require selection */}
-                      <input type="text" name="submissionMethod" required className="absolute opacity-0 w-0 h-0 pointer-events-none" value={submissionMethod} onChange={() => {}} tabIndex={-1} />
+                      <input type="text" name="submissionMethod" required className="absolute opacity-0 w-0 h-0 pointer-events-none" value={submissionMethod} onChange={() => { }} tabIndex={-1} />
 
                       <AnimatePresence mode="wait">
                         {submissionMethod === 'resume' && (
@@ -537,7 +530,7 @@ export default function CareersPage() {
                             </div>
                           </motion.div>
                         )}
-                        
+
                         {submissionMethod === 'manual' && (
                           <motion.div
                             key="manual-entry"
@@ -570,7 +563,7 @@ export default function CareersPage() {
                                   </div>
                                 </div>
                               ))}
-                              
+
                               <div className="p-4 rounded-xl border border-white/10 bg-white/[0.02] space-y-4">
                                 <p className="text-xs font-bold uppercase tracking-wider text-gold font-sans">Education</p>
                                 <div>
@@ -613,7 +606,7 @@ export default function CareersPage() {
 
                     {/* Turnstile */}
                     <div>
-                      <Turnstile 
+                      <Turnstile
                         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                         onSuccess={(token) => setTurnstileToken(token)}
                       />
@@ -649,7 +642,7 @@ export default function CareersPage() {
           </main>
 
         </div>
-        
+
         {/* Global Footer */}
         <Footer />
       </div>

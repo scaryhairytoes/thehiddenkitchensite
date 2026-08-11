@@ -32,31 +32,31 @@ const CATEGORIES: {
   icon: React.ElementType
   subOptions: string[]
 }[] = [
-  {
-    value: 'live-music',
-    label: 'MUSIC',
-    icon: Music,
-    subOptions: ['Solo / Acoustic', 'Duo / Trio', 'Full Band', 'Other Music'],
-  },
-  {
-    value: 'comedy',
-    label: 'COMEDY',
-    icon: Mic,
-    subOptions: ['Stand-Up Comedy', 'Open Mic Spot', 'Improv / Stage Act', 'Other Comedy'],
-  },
-  {
-    value: 'private-event',
-    label: 'PRIVATE EVENTS',
-    icon: Users,
-    subOptions: ['Birthday / Celebration', 'Corporate Event', 'Private Buyout', 'Other Private Event'],
-  },
-  {
-    value: 'community',
-    label: 'COMMUNITY',
-    icon: CalendarIcon,
-    subOptions: ['Trivia Night', 'Fundraiser / Benefit', 'Pop-Up Market', 'Community Gathering'],
-  },
-]
+    {
+      value: 'live-music',
+      label: 'MUSIC',
+      icon: Music,
+      subOptions: ['Solo / Acoustic', 'Duo / Trio', 'Full Band', 'Other Music'],
+    },
+    {
+      value: 'comedy',
+      label: 'COMEDY',
+      icon: Mic,
+      subOptions: ['Stand-Up Comedy', 'Open Mic Spot', 'Improv / Stage Act', 'Other Comedy'],
+    },
+    {
+      value: 'private-event',
+      label: 'PRIVATE EVENTS',
+      icon: Users,
+      subOptions: ['Birthday / Celebration', 'Corporate Event', 'Private Buyout', 'Other Private Event'],
+    },
+    {
+      value: 'community',
+      label: 'COMMUNITY',
+      icon: CalendarIcon,
+      subOptions: ['Trivia Night', 'Fundraiser / Benefit', 'Pop-Up Market', 'Community Gathering'],
+    },
+  ]
 
 // ── Shared style tokens ───────────────────────────────────────────────────────
 const inputCls =
@@ -153,14 +153,14 @@ export default function BookTheStagePage() {
 
     if (selectedCategory === 'live-music') {
       payload.musicLink = g('musicLink')
-      payload.actType   = selectedSubOption
+      payload.actType = selectedSubOption
       payload.setLength = g('setLength')
     } else if (selectedCategory === 'comedy') {
       payload.mediaLink = g('mediaLink')
-      payload.actType   = selectedSubOption
+      payload.actType = selectedSubOption
       payload.setLength = g('setLength')
     } else if (selectedCategory === 'private-event') {
-      payload.guestCount    = g('guestCount')
+      payload.guestCount = g('guestCount')
       payload.cateringNeeds = g('cateringNeeds')
     } else if (selectedCategory === 'community') {
       payload.expectedDraw = g('expectedDraw')
@@ -359,15 +359,13 @@ export default function BookTheStagePage() {
                               type="button"
                               id={`category-${value}`}
                               onClick={() => handleCategorySelect(value)}
-                              className={`group relative flex flex-col items-center justify-center text-center rounded-xl border py-5 px-4 transition-all duration-200 ${
-                                active
+                              className={`group relative flex flex-col items-center justify-center text-center rounded-xl border py-5 px-4 transition-all duration-200 ${active
                                   ? 'border-gold bg-gold/15 shadow-[0_0_20px_rgba(197,163,104,0.2)]'
                                   : 'border-white/15 bg-white/[0.03] hover:border-gold/50 hover:bg-gold/5'
-                              }`}
+                                }`}
                             >
-                              <span className={`mb-2.5 h-10 w-10 rounded-full flex items-center justify-center border transition-all ${
-                                active ? 'border-gold/60 bg-gold/25 text-gold' : 'border-white/10 bg-white/5 text-white/70 group-hover:text-gold group-hover:border-gold/30'
-                              }`}>
+                              <span className={`mb-2.5 h-10 w-10 rounded-full flex items-center justify-center border transition-all ${active ? 'border-gold/60 bg-gold/25 text-gold' : 'border-white/10 bg-white/5 text-white/70 group-hover:text-gold group-hover:border-gold/30'
+                                }`}>
                                 <Icon className="h-5 w-5 transition-transform group-hover:scale-110" />
                               </span>
                               <span className={`text-xs sm:text-sm font-black uppercase tracking-wider transition-colors ${active ? 'text-gold' : 'text-white'}`}>
@@ -406,11 +404,10 @@ export default function BookTheStagePage() {
                                     key={sub}
                                     type="button"
                                     onClick={() => setSelectedSubOption(isSubActive ? '' : sub)}
-                                    className={`px-4 py-2 rounded-lg border text-xs font-sans font-bold uppercase tracking-wider transition-all duration-150 ${
-                                      isSubActive
+                                    className={`px-4 py-2 rounded-lg border text-xs font-sans font-bold uppercase tracking-wider transition-all duration-150 ${isSubActive
                                         ? 'border-gold bg-gold text-black shadow-md'
                                         : 'border-white/15 bg-white/[0.04] text-white/80 hover:border-gold/50 hover:text-white'
-                                    }`}
+                                      }`}
                                   >
                                     {sub}
                                   </button>
@@ -568,13 +565,12 @@ export default function BookTheStagePage() {
                                     disabled={isBooked}
                                     onClick={() => handleDateClick(dateFormatted)}
                                     title={isBooked ? `Booked: ${bookedShow.act}` : dateFormatted}
-                                    className={`relative h-9 rounded-lg text-xs font-sans font-semibold flex flex-col items-center justify-center transition-all ${
-                                      isBooked
+                                    className={`relative h-9 rounded-lg text-xs font-sans font-semibold flex flex-col items-center justify-center transition-all ${isBooked
                                         ? 'bg-red-500/10 border border-red-500/20 text-red-400/50 line-through cursor-not-allowed'
                                         : isSelected
-                                        ? 'bg-gold text-black font-bold shadow-md shadow-gold/20'
-                                        : 'bg-white/[0.03] hover:bg-gold/20 hover:border-gold/40 border border-white/10 text-white'
-                                    }`}
+                                          ? 'bg-gold text-black font-bold shadow-md shadow-gold/20'
+                                          : 'bg-white/[0.03] hover:bg-gold/20 hover:border-gold/40 border border-white/10 text-white'
+                                      }`}
                                   >
                                     <span>{dayNum}</span>
                                     {isBooked && (
@@ -742,7 +738,7 @@ export default function BookTheStagePage() {
 
                     {/* Turnstile */}
                     <div>
-                      <Turnstile 
+                      <Turnstile
                         siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                         onSuccess={(token) => setTurnstileToken(token)}
                       />
@@ -779,7 +775,7 @@ export default function BookTheStagePage() {
           </main>
 
         </div>
-        
+
         {/* Global Footer */}
         <Footer />
       </div>

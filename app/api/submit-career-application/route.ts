@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
 
     const payload = await getPayload({ config })
     let resumeId: number | string | undefined = undefined
+    let emailAttachments: any[] | undefined = undefined
 
     if (submissionMethod === 'resume') {
       const resumeFile = formData.get('resume') as File | null
@@ -50,6 +51,14 @@ export async function POST(req: NextRequest) {
       }
       
       const buffer = Buffer.from(await resumeFile.arrayBuffer())
+      
+      emailAttachments = [
+        {
+          filename: resumeFile.name,
+          content: buffer,
+        }
+      ]
+
       const uploadedMedia = await payload.create({
         collection: 'resumes',
         data: {}, 
@@ -92,6 +101,36 @@ export async function POST(req: NextRequest) {
         education: formData.get('education') as string || undefined,
       },
     })
+
+    const html = `
+      <div style="font-family:'Georgia',serif;max-width:620px;margin:0 auto;background:#0a0a0a;color:#e8d8a0;padding:40px;border:1px solid rgba(214,175,0,0.3);border-radius:12px;">
+        <div style="text-align:center;margin-bottom:32px;">
+          <p style="font-size:10px;letter-spacing:0.35em;text-transform:uppercase;color:#D6AF00;margin:0 0 8px;">The Hidden Kitchen</p>
+          <h1 style="font-size:26px;font-weight:900;text-transform:uppercase;margin:0;color:#ffffff;letter-spacing:-0.02em;">New Career Application</h1>
+          <p style="margin:10px 0 0;font-size:13px;color:#D6AF00;letter-spacing:0.05em;">${position}</p>
+        </div>
+        <table style="width:100%;border-collapse:collapse;">
+          <tr><td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#D6AF00;width:160px;vertical-align:top;">Name</td><td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:14px;color:#ffffff;vertical-align:top;line-height:1.5;">${name}</td></tr>
+          <tr><td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#D6AF00;width:160px;vertical-align:top;">Email</td><td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:14px;color:#ffffff;vertical-align:top;line-height:1.5;"><a href="mailto:${email}" style="color:#D6AF00;">${email}</a></td></tr>
+          <tr><td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:#D6AF00;width:160px;vertical-align:top;">Phone</td><td style="padding:12px 0;border-bottom:1px solid rgba(214,175,0,0.12);font-size:14px;color:#ffffff;vertical-align:top;line-height:1.5;">${phone}</td></tr>
+        </table>
+        <p style="margin-top:36px;font-size:10px;color:rgba(214,175,0,0.45);text-align:center;letter-spacing:0.2em;text-transform:uppercase;">
+          Submitted via thehiddenkitchen62.com
+        </p>
+      </div>
+    `
+
+    try {
+      await payload.sendEmail({
+        to: ['careers@thehiddenkitchen62.com', 'thehiddenkitchen26@gmail.com'],
+        replyTo: email.replace(/[\r\n]/g, ''),
+        subject: `[New Career App: ${position}] ${name}`.replace(/[\r\n]/g, ''),
+        html,
+        attachments: emailAttachments,
+      })
+    } catch (err) {
+      console.error('[submit-career-application] email error:', err)
+    }
 
     return NextResponse.json({ success: true })
   } catch (err) {
