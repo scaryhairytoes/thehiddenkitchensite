@@ -1,0 +1,35 @@
+diff --git a/node_modules/@payloadcms/next/dist/views/Root/index.js b/node_modules/@payloadcms/next/dist/views/Root/index.js
+index ddfe9e6..f23e451 100644
+--- a/node_modules/@payloadcms/next/dist/views/Root/index.js
++++ b/node_modules/@payloadcms/next/dist/views/Root/index.js
+@@ -34,7 +34,7 @@ export const RootPage = async ({
+       admin: adminRoute
+     }
+   } = config;
+-  const params = await paramsPromise;
++  const params = (await paramsPromise) ?? {};
+   const currentRoute = formatAdminURL({
+     adminRoute,
+     path: Array.isArray(params.segments) ? `/${params.segments.join('/')}` : null
+@@ -44,7 +44,7 @@ export const RootPage = async ({
+   const isGlobalRoute = segments[0] === 'globals';
+   let collectionConfig = undefined;
+   let globalConfig = undefined;
+-  const searchParams = await searchParamsPromise;
++  const searchParams = (await searchParamsPromise) ?? {};
+   // Redirect `${adminRoute}/collections` to `${adminRoute}`
+   if (isCollectionRoute) {
+     if (segments.length === 1) {
+diff --git a/node_modules/@payloadcms/next/dist/views/Root/metadata.js b/node_modules/@payloadcms/next/dist/views/Root/metadata.js
+index a2ee826..d116507 100644
+--- a/node_modules/@payloadcms/next/dist/views/Root/metadata.js
++++ b/node_modules/@payloadcms/next/dist/views/Root/metadata.js
+@@ -29,7 +29,7 @@ export const generatePageMetadata = async ({
+   params: paramsPromise
+ }) => {
+   const config = await configPromise;
+-  const params = await paramsPromise;
++  const params = (await paramsPromise) ?? {};
+   const folderCollectionSlugs = config.collections.reduce((acc, {
+     slug,
+     folders
