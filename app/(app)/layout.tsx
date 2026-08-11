@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { SchemaMarkup } from '@/components/hidden-kitchen/schema-markup'
 import { Preloader } from '@/components/hidden-kitchen/preloader'
 import { CookieConsent } from '@/components/hidden-kitchen/cookie-consent'
+import { Analytics } from '@vercel/analytics/next'
 import '../globals.css'
 
 export const metadata: Metadata = {
@@ -72,6 +73,7 @@ export default function RootLayout({
         <Preloader />
         {children}
         <CookieConsent />
+        <Analytics />
       </body>
     </html>
   )
