@@ -55,19 +55,23 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  email: nodemailerAdapter({
-    defaultFromAddress: 'events@thehiddenkitchen62.com',
-    defaultFromName: 'The Hidden Kitchen Website',
-    transportOptions: {
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: process.env.SMTP_SECURE === 'true',
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    },
-  }),
+  ...(process.env.SMTP_HOST?.trim()
+    ? {
+        email: nodemailerAdapter({
+          defaultFromAddress: process.env.SMTP_FROM_ADDRESS || 'events@thehiddenkitchen62.com',
+          defaultFromName: process.env.SMTP_FROM_NAME || 'The Hidden Kitchen Website',
+          transportOptions: {
+            host: process.env.SMTP_HOST,
+            port: Number(process.env.SMTP_PORT) || 587,
+            secure: process.env.SMTP_SECURE === 'true',
+            auth: {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASS,
+            },
+          },
+        }),
+      }
+    : {}),
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URL!,
