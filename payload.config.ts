@@ -573,18 +573,18 @@ export default buildConfig({
         },
         {
           name: 'hour',
-          label: 'Start Hour 24h (e.g. 17 for 5:00 PM)',
+          label: 'Start Hour 24h (e.g. 17.5 for 5:30 PM)',
           type: 'number',
           required: true,
-          defaultValue: 17,
+          defaultValue: 17.5,
         },
         {
           name: 'endHour',
-          label: 'End Hour 24h (e.g. 20 for 8:00 PM)',
+          label: 'End Hour 24h (e.g. 20.5 for 8:30 PM)',
           type: 'number',
-          defaultValue: 20,
+          defaultValue: 20.5,
           admin: {
-            description: 'End time in 24-hour format (e.g. 20 for 8:00 PM). If empty, defaults to 3 hours after start hour.',
+            description: 'End time in 24-hour format (e.g. 20.5 for 8:30 PM). If empty, defaults to 3 hours after start hour.',
           },
         },
         {
