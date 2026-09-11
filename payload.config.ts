@@ -178,7 +178,7 @@ export default buildConfig({
 
             try {
               await req.payload.sendEmail({
-                to: 'events@thehiddenkitchen62.com',
+                to: ['events@thehiddenkitchen62.com', 'thehiddenkitchen26@gmail.com'],
                 replyTo: email,
                 subject: `[New ${categoryLabel} Booking] ${name}`,
                 html,
@@ -348,7 +348,7 @@ export default buildConfig({
 
             try {
               await req.payload.sendEmail({
-                to: 'careers@thehiddenkitchen62.com',
+                to: ['careers@thehiddenkitchen62.com', 'thehiddenkitchen26@gmail.com'],
                 replyTo: email,
                 subject: `[New Career App: ${position}] ${name}`,
                 html,
@@ -497,7 +497,7 @@ export default buildConfig({
 
             try {
               await req.payload.sendEmail({
-                to: 'reservations@thehiddenkitchen62.com',
+                to: ['reservations@thehiddenkitchen62.com', 'thehiddenkitchen26@gmail.com'],
                 replyTo: email,
                 subject: `[Reservation Request] ${date} - ${name} (${partySize} guests)`,
                 html,
