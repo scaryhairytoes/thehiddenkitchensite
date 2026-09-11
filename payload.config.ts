@@ -1,6 +1,7 @@
 import { buildConfig } from 'payload'
 // Payload CMS Configuration - The Hidden Kitchen v2
 import { s3Storage } from '@payloadcms/storage-s3'
+import { resendAdapter } from '@payloadcms/email-resend'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
@@ -55,7 +56,15 @@ export default buildConfig({
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
-  ...(process.env.SMTP_HOST?.trim()
+  ...(process.env.RESEND_API_KEY?.trim()
+    ? {
+        email: resendAdapter({
+          defaultFromAddress: process.env.SMTP_FROM_ADDRESS || 'events@thehiddenkitchen62.com',
+          defaultFromName: process.env.SMTP_FROM_NAME || 'The Hidden Kitchen Website',
+          apiKey: process.env.RESEND_API_KEY.trim(),
+        }),
+      }
+    : process.env.SMTP_HOST?.trim()
     ? {
         email: nodemailerAdapter({
           defaultFromAddress: process.env.SMTP_FROM_ADDRESS || 'events@thehiddenkitchen62.com',
