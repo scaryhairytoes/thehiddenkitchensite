@@ -5,6 +5,9 @@ import { CookieConsent } from '@/components/hidden-kitchen/cookie-consent'
 import { getBusinessHours } from '@/lib/business-hours'
 import '../globals.css'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://thehiddenkitchen62.com'),
   title: {

@@ -16,13 +16,8 @@ export function Footer({ initialHours }: FooterProps = {}) {
   const [hours, setHours] = useState<DayHours[]>(() => initialHours || DEFAULT_HOURS)
 
   useEffect(() => {
-    if (initialHours && initialHours.length > 0) {
-      setHours(initialHours)
-      return
-    }
-
     let isMounted = true
-    fetch('/api/business-hours')
+    fetch('/api/business-hours', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (isMounted && data?.hours && Array.isArray(data.hours)) {
@@ -36,7 +31,7 @@ export function Footer({ initialHours }: FooterProps = {}) {
     return () => {
       isMounted = false
     }
-  }, [initialHours])
+  }, [])
 
   const scrollToTop = () => {
     if (typeof window !== 'undefined') {

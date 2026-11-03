@@ -24,7 +24,7 @@ export function useBusinessStatus(initialHours?: DayHours[]) {
   const hoursRef = useRef(hours)
   hoursRef.current = hours
 
-  // If initialHours were passed and change, update state
+  // If initialHours change, update state
   useEffect(() => {
     if (initialHours && initialHours.length > 0) {
       setHours(initialHours)
@@ -32,12 +32,10 @@ export function useBusinessStatus(initialHours?: DayHours[]) {
     }
   }, [initialHours])
 
-  // Fetch latest hours from API if not initially provided
+  // Always fetch latest hours from API on client mount
   useEffect(() => {
-    if (initialHours && initialHours.length > 0) return
-
     let isMounted = true
-    fetch('/api/business-hours')
+    fetch('/api/business-hours', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (isMounted && data?.hours && Array.isArray(data.hours)) {
@@ -46,13 +44,13 @@ export function useBusinessStatus(initialHours?: DayHours[]) {
         }
       })
       .catch((err) => {
-        console.warn('[live-status] Could not fetch CMS hours, using defaults:', err)
+        console.warn('[live-status] Could not fetch CMS hours, using current state:', err)
       })
 
     return () => {
       isMounted = false
     }
-  }, [initialHours])
+  }, [])
 
   // Recalculate status every minute
   useEffect(() => {

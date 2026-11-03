@@ -34,7 +34,7 @@ export default function ReservationsPage() {
 
   useEffect(() => {
     let isMounted = true
-    fetch('/api/business-hours')
+    fetch('/api/business-hours', { cache: 'no-store' })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (isMounted && data?.hours && Array.isArray(data.hours)) {

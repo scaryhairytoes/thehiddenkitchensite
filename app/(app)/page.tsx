@@ -8,6 +8,9 @@ import { GrainOverlay } from '@/components/hidden-kitchen/grain-overlay'
 import { SectionDivider } from '@/components/hidden-kitchen/section-divider'
 import { getBusinessHours } from '@/lib/business-hours'
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function Page() {
   const hours = await getBusinessHours()
 
