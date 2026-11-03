@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { SchemaMarkup } from '@/components/hidden-kitchen/schema-markup'
 import { Preloader } from '@/components/hidden-kitchen/preloader'
 import { CookieConsent } from '@/components/hidden-kitchen/cookie-consent'
+import { getBusinessHours } from '@/lib/business-hours'
 import '../globals.css'
 
 export const metadata: Metadata = {
@@ -60,15 +61,17 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const hours = await getBusinessHours()
+
   return (
     <html lang="en" className="dark scroll-smooth" data-scroll-behavior="smooth">
       <body className="min-h-screen bg-black font-sans text-foreground antialiased selection:bg-gold selection:text-black">
-        <SchemaMarkup />
+        <SchemaMarkup hours={hours} />
         <Preloader />
         {children}
         <CookieConsent />

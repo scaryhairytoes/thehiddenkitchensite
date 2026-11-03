@@ -8,6 +8,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { initialMenuPanels, initialLineupShows } from '@/lib/initial-cms-data'
+import { DEFAULT_HOURS } from '@/lib/business-hours'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -43,6 +44,24 @@ export default buildConfig({
             data: show as any,
           })
         }
+      }
+
+      // Seed business hours global if empty
+      try {
+        const hoursData = await payload.findGlobal({ slug: 'business-hours' })
+        if (!hoursData?.days?.length) {
+          console.log('[Payload] Auto-seeding business hours...')
+          await payload.updateGlobal({
+            slug: 'business-hours',
+            data: { days: DEFAULT_HOURS } as any,
+          })
+        }
+      } catch {
+        console.log('[Payload] Auto-seeding business hours (first run)...')
+        await payload.updateGlobal({
+          slug: 'business-hours',
+          data: { days: DEFAULT_HOURS } as any,
+        })
       }
     } catch (err) {
       console.error('[Payload onInit] Error auto-seeding:', err)
@@ -712,6 +731,91 @@ export default buildConfig({
               name: 'price',
               label: 'Price (optional)',
               type: 'text',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+  globals: [
+    {
+      slug: 'business-hours',
+      label: 'Business Hours',
+      access: {
+        read: () => true,
+      },
+      admin: {
+        group: 'Settings',
+        description: 'Configure weekly operating hours, kitchen & bar times, and footer display labels.',
+      },
+      fields: [
+        {
+          name: 'days',
+          label: 'Weekly Schedule',
+          type: 'array',
+          required: true,
+
+          fields: [
+            {
+              name: 'day',
+              label: 'Day of Week',
+              type: 'select',
+              required: true,
+              options: [
+                { label: 'Sunday', value: 'sunday' },
+                { label: 'Monday', value: 'monday' },
+                { label: 'Tuesday', value: 'tuesday' },
+                { label: 'Wednesday', value: 'wednesday' },
+                { label: 'Thursday', value: 'thursday' },
+                { label: 'Friday', value: 'friday' },
+                { label: 'Saturday', value: 'saturday' },
+              ],
+            },
+            {
+              name: 'isClosed',
+              label: 'Closed All Day',
+              type: 'checkbox',
+              defaultValue: false,
+            },
+            {
+              name: 'kitchenOpen',
+              label: 'Kitchen Open (24h, e.g. 11:00)',
+              type: 'text',
+              admin: {
+                condition: (_: any, siblingData: any) => !siblingData?.isClosed,
+              },
+            },
+            {
+              name: 'kitchenClose',
+              label: 'Kitchen Close (24h, e.g. 20:00)',
+              type: 'text',
+              admin: {
+                condition: (_: any, siblingData: any) => !siblingData?.isClosed,
+              },
+            },
+            {
+              name: 'barOpen',
+              label: 'Bar Open (24h, e.g. 11:00)',
+              type: 'text',
+              admin: {
+                condition: (_: any, siblingData: any) => !siblingData?.isClosed,
+              },
+            },
+            {
+              name: 'barClose',
+              label: 'Bar Close (24h, e.g. 00:00 for Midnight)',
+              type: 'text',
+              admin: {
+                condition: (_: any, siblingData: any) => !siblingData?.isClosed,
+              },
+            },
+            {
+              name: 'label',
+              label: 'Footer Display Label (e.g. 11AM–8PM (BAR TIL MIDNIGHT))',
+              type: 'text',
+              admin: {
+                description: 'Text shown in the website footer for this day.',
+              },
             },
           ],
         },

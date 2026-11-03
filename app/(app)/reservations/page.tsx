@@ -1,11 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowLeft,
-  CalendarDays,
   Users,
   CheckCircle,
   AlertCircle,
@@ -13,26 +12,46 @@ import {
   Loader2,
 } from 'lucide-react'
 import { Footer } from '@/components/hidden-kitchen/footer'
+import {
+  DayHours,
+  DEFAULT_HOURS,
+  generateTimeSlots,
+  getOpenDaysText,
+} from '@/lib/business-hours-shared'
 
 // ── Shared style tokens ───────────────────────────────────────────────────────
 const inputCls =
   'w-full rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3 text-sm text-white placeholder:text-white/40 font-sans focus:outline-none focus:border-[#c5a368]/60 focus:bg-[#c5a368]/5 transition-all duration-200'
 const labelCls = 'block text-xs font-sans font-bold uppercase tracking-[0.2em] text-gold mb-2'
 
-const TIME_SLOTS = [
-  '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
-  '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
-  '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM',
-  '5:00 PM', '5:30 PM', '6:00 PM', '6:30 PM', 
-  '7:00 PM', '7:30 PM', '8:00 PM'
-]
-
 export default function ReservationsPage() {
+  const [hours, setHours] = useState<DayHours[]>(DEFAULT_HOURS)
   const [partySize, setPartySize] = useState<number | ''>('')
   const [selectedTime, setSelectedTime] = useState<string>('')
   
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+
+  useEffect(() => {
+    let isMounted = true
+    fetch('/api/business-hours')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data?.hours && Array.isArray(data.hours)) {
+          setHours(data.hours)
+        }
+      })
+      .catch((err) => {
+        console.warn('[reservations] Could not fetch CMS hours, using defaults:', err)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  const timeSlots = useMemo(() => generateTimeSlots(hours), [hours])
+  const openDaysText = useMemo(() => getOpenDaysText(hours), [hours])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -145,7 +164,7 @@ export default function ReservationsPage() {
                 <div className="p-4 rounded-xl border border-gold/20 bg-gold/5">
                   <h3 className="text-xs font-bold uppercase tracking-widest text-gold mb-1 font-sans">Important Details</h3>
                   <p className="text-xs text-white/80 font-sans leading-relaxed">
-                    Reservations are recommended for weekends and live events. We are open Tuesday - Sunday. For parties of 9 or more, please contact us directly.
+                    Reservations are recommended for weekends and live events. We are open {openDaysText || 'Tuesday - Sunday'}. For parties of 9 or more, please contact us directly.
                   </p>
                 </div>
               </div>
@@ -237,7 +256,7 @@ export default function ReservationsPage() {
                         Time <span className="text-red-500/80">*</span>
                       </label>
                       <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                        {TIME_SLOTS.map((time) => (
+                        {timeSlots.map((time) => (
                           <button
                             key={time}
                             type="button"
@@ -336,7 +355,7 @@ export default function ReservationsPage() {
         </div>
         
         {/* Global Footer */}
-        <Footer />
+        <Footer initialHours={hours} />
       </div>
     </div>
   )

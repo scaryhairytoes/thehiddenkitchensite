@@ -4,8 +4,13 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import Image from 'next/image'
 import { Phone, MapPin } from 'lucide-react'
 import { useBusinessStatus } from '@/components/hidden-kitchen/live-status'
+import type { DayHours } from '@/lib/business-hours-shared'
 
-export function Hero() {
+interface HeroProps {
+  initialHours?: DayHours[]
+}
+
+export function Hero({ initialHours }: HeroProps = {}) {
   const { scrollY } = useScroll()
 
   const titleScale = useTransform(scrollY, [0, 400], [1, 0.86])
@@ -13,7 +18,7 @@ export function Hero() {
   const bottomOpacity = useTransform(scrollY, [0, 20], [1, 0])
   const bottomY = useTransform(scrollY, [0, 100], [0, -100])
 
-  const status = useBusinessStatus()
+  const status = useBusinessStatus(initialHours)
 
   const scrollToVisit = () => {
     const el = document.getElementById('visit')

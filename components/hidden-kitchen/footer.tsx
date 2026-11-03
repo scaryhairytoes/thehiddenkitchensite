@@ -1,13 +1,50 @@
 'use client'
 
+import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
+import {
+  DayHours,
+  DEFAULT_HOURS,
+  groupHoursForDisplay,
+} from '@/lib/business-hours-shared'
 
-export function Footer() {
+interface FooterProps {
+  initialHours?: DayHours[]
+}
+
+export function Footer({ initialHours }: FooterProps = {}) {
+  const [hours, setHours] = useState<DayHours[]>(() => initialHours || DEFAULT_HOURS)
+
+  useEffect(() => {
+    if (initialHours && initialHours.length > 0) {
+      setHours(initialHours)
+      return
+    }
+
+    let isMounted = true
+    fetch('/api/business-hours')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (isMounted && data?.hours && Array.isArray(data.hours)) {
+          setHours(data.hours)
+        }
+      })
+      .catch((err) => {
+        console.warn('[footer] Could not fetch CMS hours, using defaults:', err)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [initialHours])
+
   const scrollToTop = () => {
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
+
+  const hoursGroups = groupHoursForDisplay(hours)
 
   return (
     <footer id="visit" className="relative z-30 w-full bg-black text-foreground font-sans border-t border-zinc-900 py-16 lg:py-24 flex flex-col items-center text-center">
@@ -55,19 +92,17 @@ export function Footer() {
           <a href="mailto:contact@thehiddenkitchen62.com" className="inline-block mx-2 text-[#B0B0B0] hover:text-gold transition-colors text-center">CONTACT@THEHIDDENKITCHEN62.COM</a>
         </address>
 
-        {/* 6. SIXTH ELEMENT: Condensed Hours Line */}
+        {/* 6. SIXTH ELEMENT: Condensed Hours Line (CMS Dynamic) */}
         <div className="text-[10px] sm:text-xs lg:text-sm font-bold uppercase tracking-widest mb-12 lg:mb-16 max-w-5xl px-4 leading-loose flex flex-col items-center gap-3 lg:flex-row lg:justify-center lg:gap-0">
-          <span className="inline-block mx-2 text-center">
-            <span className="text-[#B0B0B0]">MON:</span> <span className="text-[#B0B0B0]">CLOSED</span>
-          </span>
-          <span className="hidden lg:inline-block mx-2 opacity-30 text-[#B0B0B0]">•</span>
-          <span className="inline-block mx-2 text-center">
-            <span className="text-[#B0B0B0]">TUE - SAT:</span> <span className="text-[#B0B0B0]">11AM–8PM (BAR TIL MIDNIGHT)</span>
-          </span>
-          <span className="hidden lg:inline-block mx-2 opacity-30 text-[#B0B0B0]">•</span>
-          <span className="inline-block mx-2 text-center">
-            <span className="text-[#B0B0B0]">SUN:</span> <span className="text-[#B0B0B0]">11AM–8PM (BAR 12PM–MIDNIGHT)</span>
-          </span>
+          {hoursGroups.map((group, idx) => (
+            <React.Fragment key={group.dayRange}>
+              {idx > 0 && <span className="hidden lg:inline-block mx-2 opacity-30 text-[#B0B0B0]">•</span>}
+              <span className="inline-block mx-2 text-center">
+                <span className="text-[#B0B0B0]">{group.dayRange}:</span>{' '}
+                <span className="text-[#B0B0B0]">{group.label}</span>
+              </span>
+            </React.Fragment>
+          ))}
         </div>
 
         {/* 7. SEVENTH ELEMENT: Bottom Utility Links & Copyright */}

@@ -3,6 +3,7 @@ import { getPayload } from 'payload'
 import configPromise from '@/payload.config'
 
 import { initialMenuPanels, initialLineupShows } from '@/lib/initial-cms-data'
+import { DEFAULT_HOURS } from '@/lib/business-hours-shared'
 
 export async function GET(request: Request) {
   try {
@@ -12,6 +13,7 @@ export async function GET(request: Request) {
 
     let seededMenu = 0
     let seededLineup = 0
+    let seededHours = false
 
     // Seed Menu if empty or force=true
     const menuCount = await payload.count({ collection: 'menu' })
@@ -43,11 +45,33 @@ export async function GET(request: Request) {
       }
     }
 
+    // Seed Business Hours if empty or force=true
+    try {
+      const hoursData = await payload.findGlobal({ slug: 'business-hours' })
+      if (!hoursData?.days?.length || force) {
+        await payload.updateGlobal({
+          slug: 'business-hours',
+          data: { days: DEFAULT_HOURS } as any,
+        })
+        seededHours = true
+      }
+    } catch {
+      await payload.updateGlobal({
+        slug: 'business-hours',
+        data: { days: DEFAULT_HOURS } as any,
+      })
+      seededHours = true
+    }
+
+    const currentHours = await payload.findGlobal({ slug: 'business-hours' })
+
     return NextResponse.json({
       success: true,
-      message: `Seeded ${seededMenu} menu categories and ${seededLineup} stage lineup acts into Payload CMS.`,
+      message: `Seeded ${seededMenu} menu categories, ${seededLineup} stage lineup acts, and business hours into Payload CMS.`,
       menuTotal: (await payload.count({ collection: 'menu' })).totalDocs,
       lineupTotal: (await payload.count({ collection: 'lineup' })).totalDocs,
+      seededHours,
+      businessHours: currentHours,
     })
   } catch (error: any) {
     console.error('[API /seed] Error seeding Payload CMS:', error)

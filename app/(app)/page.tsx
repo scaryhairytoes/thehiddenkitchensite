@@ -1,18 +1,20 @@
 import { EdgeNav } from '@/components/hidden-kitchen/edge-nav'
 import { Hero } from '@/components/hidden-kitchen/hero'
-import { UpNext } from '@/components/hidden-kitchen/up-next'
 import { Story } from '@/components/hidden-kitchen/story'
 import { Menu } from '@/components/hidden-kitchen/menu'
 import { Stage } from '@/components/hidden-kitchen/stage'
 import { Footer } from '@/components/hidden-kitchen/footer'
 import { GrainOverlay } from '@/components/hidden-kitchen/grain-overlay'
 import { SectionDivider } from '@/components/hidden-kitchen/section-divider'
+import { getBusinessHours } from '@/lib/business-hours'
 
-export default function Page() {
+export default async function Page() {
+  const hours = await getBusinessHours()
+
   return (
     <main className="relative bg-black text-foreground" suppressHydrationWarning>
       <GrainOverlay />
-      <Hero />
+      <Hero initialHours={hours} />
       <EdgeNav />
       <SectionDivider />
 
@@ -25,7 +27,7 @@ export default function Page() {
       <Stage />
       <SectionDivider />
 
-      <Footer />
+      <Footer initialHours={hours} />
     </main>
   )
 }
